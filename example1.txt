@@ -7,50 +7,52 @@ timeslots: [1,2,3,4,5]
  5: 17:40 - 19:20
 
 
-2023年10月
+2023年8月
 ========
-01 (日):
-02 (月):
-03 (火):
-04 (水):
-05 (木):
-06 (金):
-07 (土):
-08 (日):
-09 (月):
- * name: スポーツの日
- - type: public_holiday,
- * name: 月曜特別営業日
- - type: local_workday,
-10 (火):
+01(火):
+02(水):
+03(木):
+04(金):
+05(土):
+06(日):
+07(月):
+08(火):
  * name: 定休日
- - type: local_holiday,
-11 (水):
+ - type: local_holiday
+ * name: OB講演会
+ - type: event
+ - time: 1,2,3 (slots)
+09(水):
  * name: 定休日
- - type: local_holiday,
-12 (木):
- * name: 臨時休業
- - type: local_holiday,
-13 (金):
-14 (土):
-15 (日):
-16 (月):
-17 (火):
-18 (水):
-19 (木):
-20 (金):
-21 (土):
-22 (日):
-23 (月):
-24 (火):
+ - type: local_holiday
+10(木):
+11(金):
+ * name: 山の日
+ - type: public_holiday
+12(土):
+13(日):
+14(月):
+15(火):
+16(水):
+17(木):
+ * name: 合同中間発表会
+ - type: event
+ - time: 2,3,4 (slots)
+18(金):
+19(土):
+20(日):
+21(月):
+22(火):
  * name: 定休日
- - type: local_holiday,
-25 (水):
+ - type: local_holiday
+23(水):
  * name: 定休日
- - type: local_holiday,
-26 (木):
-27 (金):
-28 (土):
-29 (日):
-30 (月):
-31 (火):
+ - type: local_holiday
+24(木):
+25(金):
+26(土):
+27(日):
+28(月):
+29(火):
+30(水):
+31(木):
