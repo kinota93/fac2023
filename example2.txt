@@ -18,7 +18,7 @@ timeslots: every 10 minute(s)
 12(火):
  * name: 定休日
  - type: local_holiday
- * name: 合同中間発表会
+ * name: 運用室会議
  - type: event
  - time: 10:40 - 12:30
 13(水):
