@@ -15,8 +15,7 @@ $dates = getAvailability($year, $month,$facility);
 $dat_facility = include('dat/php/dat_facilities.php');
 echo "facility: ", $facility, "\n";
 $fac = $cal->parseFacility($dat_facility, $facility);
-if ($fac){
-    
+if ($fac){    
     if (isset($fac['time'])){
         echo "time: " , $fac['time'], "\n";
     }
