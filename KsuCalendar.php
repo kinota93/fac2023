@@ -1,10 +1,12 @@
 <?php
 class KsuCalendar
 {
-    public $year, $month;
-    public $lastday, $n_weeks;
-    public $firstwday, $lastwday;
-    public $firstweek, $lastweek;
+    public $year;// @var 
+    public $month;// @var 
+    public $lastday;// @var 
+    public $n_weeks;// @var 
+    public $firstwday, $lastwday;// @var 
+
     
     public function __construct($year, $month)
     {
@@ -15,10 +17,7 @@ class KsuCalendar
         $this->firstwday = (int)date('w', $time);
         $this->lastwday = ($this->firstwday + $this->lastday -1) % 7;
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
-        // $this->firstweek = $this->getWeekday(range(1,7));   
-        // $this->lastweek = $this->getWeekday(range($this->lastday-$this->lastwday,$this->lastday));
     }
-
     
     /** filter function: returns days of the specified weekdays and weeks  */
     public function filter($week=[], $wday=[])
@@ -66,7 +65,7 @@ class KsuCalendar
         return ($this->firstwday + $day -1) % 7;
     }
     /** getWeekday function: returns wdays of $days */
-    public function getWeekday($days){
+    public function wdays($days){
         return array_combine($days, array_map([$this,'wday'], $days));
     }
 
@@ -146,7 +145,7 @@ class KsuCalendar
 
     public function output($dates)
     {
-        $days = $this->getWeekday(range(1, $this->lastday));     
+        $days = $this->wdays(range(1, $this->lastday));     
         $names =["日", "月", "火", "水", "木", "金", "土"];
         foreach ($days as $d=>$w){
             printf( "%02d(%s):\n",$d, $names[$w]);
