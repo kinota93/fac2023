@@ -7,10 +7,11 @@
 
 <?php
 $urls = [
-    "yaml.php"=>"data in yaml",
-    "available.php"=>"available of 12216 on 2023-8",
+    "dat_yaml.php"=>"data in yaml",
+    "dat_array.php"=>"data in php array",
     "available.php?y=2024"=>"undefined calendar",
     "available.php?f=12207"=>"undefined facility",
+    "available.php"=>"available of 12216 on 2023-8",
     "available.php?y=2023&m=8"=>"given year, month, default facility(12216)",
     "available.php?y=2023&m=8&f=12107"=>"given year,month and facility(12107)",
     "available.php?y=2023&m=8&f=12216"=>"given year,month and facility(12216)",
