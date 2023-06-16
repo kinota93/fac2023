@@ -30,9 +30,9 @@ echo "\n";
 printf("%d年%d月\n========\n", $cal->year, $cal->month);
 $cal->output($dates);
 
-// print_r($cal->getWeekSlice(1));
-// print_r($cal->getWeekSlice(4));
-// print_r($cal->getWeekSlice(5));
+// print_r($cal->slice(1));
+// print_r($cal->slice(4));
+// print_r($cal->slice(5));
 
 function getAvailability($year, $month, $facility)
 {
