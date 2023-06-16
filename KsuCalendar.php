@@ -1,11 +1,12 @@
 <?php
 class KsuCalendar
 {
-    public $year;// @var 
-    public $month;// @var 
-    public $lastday;// @var 
-    public $n_weeks;// @var 
-    public $firstwday, $lastwday;// @var 
+    public $year;// @var year
+    public $month;// @var month
+    public $lastday;// @var lastday of the month
+    public $n_weeks;// @var number of weeks
+    public $firstwday;// @var weekday of the first day 
+    public $lastwday;// @var weekday of the last day
 
     
     public function __construct($year, $month)
@@ -23,16 +24,11 @@ class KsuCalendar
     public function filter($week=[], $wday=[])
     {    
         $days = [];
-        $wday = self::_valid_array($wday, range(0, 6)) ;
-        $week = self::_valid_array($week, range(1, $this->n_weeks));
-        foreach ($wday as $w){
-            for ($d = $this->firstweek($w); $d <= $this->lastday; $d +=7){
-                foreach ($week as $j){
-                    if ($d == $this->firstweek($w) + 7*($j-1)){
-                        $days[] = $d;
-                    }
-                }  
-            }
+        $wdays = self::_valid_array($wday, range(0, 6)) ;
+        $weeks = self::_valid_array($week, range(1, $this->n_weeks));
+        foreach ($wdays as $w){
+            foreach ($weeks as $j)
+                $days[]=$this->weekday($w, $j);
         };
         sort($days);
         return $days;
@@ -50,13 +46,20 @@ class KsuCalendar
         return [];
     }
 
-    /** firstweek() function: return first day of weekday `$wday` */
-    public function firstweek($wday)
+    /** weekday() function: return `$i`'th day of weekday `$wday` */
+    public function weekday($wday, $i=1)
     {
         if ($wday >= $this->firstwday) {
-            return $wday - $this->firstwday + 1;
+            $firstwd = $wday - $this->firstwday + 1;
+        }else{
+            $firstwd = $this->firstwday + $wday;
         }
-        return $this->firstwday + $wday;
+        return $firstwd + ($i-1) * 7; 
+    }
+    /** allweeks() function: return all days of weekday `$wday` */
+    public function allweeks($wday)
+    {
+        return range($this->weekday($wday), $this->lastday, 7);
     }
 
     /** wday() function: return weekday of `$day` */
@@ -64,12 +67,8 @@ class KsuCalendar
     {
         return ($this->firstwday + $day -1) % 7;
     }
-    /** getWeekday function: returns wdays of $days */
-    public function wdays($days){
-        return array_combine($days, array_map([$this,'wday'], $days));
-    }
 
-    public function parseCalendar($calendar)
+    public function parseCalendar($calendar, $holiday='定休日',$workday='営業日')
     {
         $dates = [];
         foreach ($calendar as $day){
@@ -85,7 +84,7 @@ class KsuCalendar
             else if (!isset($day['month']) or
                      (isset($day['month']) and in_array($this->month, $day['month'])) ){
             // 定休日[定休曜日]・営業日[営業曜日]
-                $name = substr($day['type'],-7)=='holiday' ? '定休日' : '営業日';
+                $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
                 $wday = self::_valid_array($day['weekday']);
                 $week = self::_valid_array($day['week']) ;
                 $days = $this->filter($week, $wday);   
@@ -138,16 +137,18 @@ class KsuCalendar
                     $dates[$d][] =  $rs;
                 }
             }
-        
         }
         return $dates;
     }
 
     public function output($dates)
     {
-        $days = $this->wdays(range(1, $this->lastday));     
+        $days = range(1, $this->lastday);
+        $wdays = array_map([$this,'wday'], $days);
         $names =["日", "月", "火", "水", "木", "金", "土"];
-        foreach ($days as $d=>$w){
+        for ($i= 0; $i< $this->lastday; $i++){
+            $d = $days[$i];
+            $w = $wdays[$i];
             printf( "%02d(%s):\n",$d, $names[$w]);
             if (! isset($dates[$d])) continue;
             foreach ($dates[$d] as $r){
