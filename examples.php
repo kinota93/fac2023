@@ -25,7 +25,13 @@ foreach ($urls as $url=>$label){
 }
 ?>
 </ol>
+<?php
+// echo '<br>p<pre>';
+// include 'KsuCalendar.php';
+// $a = [1,3]; $b= ['a', 'g', 'h'];
+// print_r(KsuCalendar::cartesian($a, $b));
 
+?>
 
 </body>
 </html>

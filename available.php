@@ -1,5 +1,6 @@
 <?php
-require 'KsuCalendar.php';
+require_once 'lib/KsuCalendar.php';
+require_once 'lib/Availability.php';
 
 header('Content-Type: text/plain; charset=UTF-8');
 $year =  2023;
@@ -9,12 +10,14 @@ if (isset($_GET['y'])) $year = $_GET['y'];
 if (isset($_GET['m'])) $month = $_GET['m'];
 if (isset($_GET['f'])) $facility = $_GET['f'];
 
-$cal = new KsuCalendar($year, $month);
-$dates = getAvailability($year, $month,$facility);
-
+$kcal = new kcal\Availability($year, $month, $facility);
+$dat_calendar = include('dat/php/dat_calendar.php');
+$dat_reservation = include('dat/php/dat_reservation.php');   
 $dat_facility = include('dat/php/dat_facilities.php');
+$dates = $kcal->getAvailability($dat_calendar, $dat_reservation);
+
 echo "facility: ", $facility, "\n";
-$fac = $cal->parseFacility($dat_facility, $facility);
+$fac = $kcal->parseFacility($dat_facility, $facility);
 if ($fac){    
     if (isset($fac['time'])){
         echo "time: " , $fac['time'], "\n";
@@ -27,27 +30,9 @@ if ($fac){
 }
 echo "\n";
 
-printf("%d年%d月\n========\n", $cal->year, $cal->month);
-$cal->output($dates);
+printf("%d年%d月\n========\n", $kcal->cal->year, $kcal->cal->month);
+$kcal->output($dates);
 
-// print_r($cal->slice(1));
-// print_r($cal->slice(4));
-// print_r($cal->slice(5));
-
-function getAvailability($year, $month, $facility)
-{
-    $dat_calendar = include('dat/php/dat_calendar.php');
-    $dat_reservation = include('dat/php/dat_reservation.php');   
-    $cal = new KsuCalendar($year, $month);
-    $dates = [];
-    if (isset($dat_calendar[$year])){
-        $cal_dates = $cal->parseCalendar($dat_calendar[$year]);    
-        $rev_dates = $cal->parseReservation($dat_reservation, $facility);
-        $dates = $cal_dates;
-        foreach ($rev_dates as $d=>$v){
-            $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
-        }
-    } 
-    ksort($dates);
-    return $dates;
-}
+$days = $kcal->cal->slice([1,2,5]);
+sort($days);
+print_r($days);
