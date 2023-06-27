@@ -42,7 +42,8 @@ class KsuCalendar
         $week = self::_valid_array($week, range(1, $this->n_weeks));
         $wday = self::_valid_array($wday, range(0, 6));
         foreach (self::cartesian($week, $wday) as $w){
-            $days[] = $this->wk2day($w[1], $w[0]);
+            $d = $this->wk2day($w[1], $w[0]);
+            if ($d <= $this->lastday) $days[] = $d;
         };
         return $days;
     }    
@@ -59,8 +60,7 @@ class KsuCalendar
             $i = ($w[1] >= $this->firstwday) ? $w[0] : $w[0] -1;
             if ($i < 1) continue;
             $d = $this->wk2day($w[1], $i);
-            if ($d <= $this->lastday)
-                $days[] = $d;
+            if ($d <= $this->lastday) $days[] = $d;
         };
         return $days;
     }

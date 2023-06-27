@@ -10,16 +10,16 @@ if (isset($_GET['y'])) $year = $_GET['y'];
 if (isset($_GET['m'])) $month = $_GET['m'];
 if (isset($_GET['f'])) $facility = $_GET['f'];
 
-$kcal = new kcal\Availability($year, $month, $facility);
-$true_year = $kcal->cal->year; 
-$true_month = $kcal->cal->month;
+$avl = new kcal\Availability($year, $month, $facility);
+$true_year = $avl->cal->year; 
+$true_month = $avl->cal->month;
 $dat_calendar = include('dat/php/dat_calendar.php');
 $dat_reservation = include('dat/php/dat_reservation.php');   
 $dat_facility = include('dat/php/dat_facilities.php');
-$dates = $kcal->getAvailability($dat_calendar, $dat_reservation);
+$dates = $avl->getAvailability($dat_calendar, $dat_reservation);
 
 echo "facility: ", $facility, "\n";
-$fac = $kcal->parseFacility($dat_facility);
+$fac = $avl->parseFacility($dat_facility);
 if ($fac){    
     if (isset($fac['time'])){
         echo "time: " , $fac['time'], "\n";
@@ -33,8 +33,18 @@ if ($fac){
 echo "\n";
 
 printf("%d年%d月\n========\n", $true_year, $true_month);
-$kcal->output($dates);
+$avl->output($dates);
 
-$days = $kcal->cal->slice([1,2,5]);
+$week = [1,2,5];
+$wday = [0,6];
+echo "\n";
+printf("filter(\$week=[%s],\$wday=[%s])\n========\n", implode(',', $week),implode(',', $wday));
+$days = $avl->cal->filter($week, $wday);
+sort($days);
+print_r($days);
+
+echo "\n";
+printf("slice(\$week=[%s],\$wday=[%s])\n========\n", implode(',', $week),implode(',', $wday));
+$days = $avl->cal->slice($week, $wday);
 sort($days);
 print_r($days);
