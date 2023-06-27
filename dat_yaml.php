@@ -9,13 +9,12 @@ $input = file_get_contents("dat/calendar.yaml");
 $result = Yaml::parse($input);
 var_dump($result);
 
-echo "=======dat/reservation.yaml============\n";
-$input = file_get_contents("dat/reservation.yaml");
+echo "=======dat/facilities.yaml============\n";
+$input = file_get_contents("dat/facilities.yaml");
 $result = Yaml::parse($input);
 var_dump($result);
 
-
-echo "=======dat/facilities.yaml============\n";
-$input = file_get_contents("dat/facilities.yaml");
+echo "=======dat/reservation.yaml============\n";
+$input = file_get_contents("dat/reservation.yaml");
 $result = Yaml::parse($input);
 var_dump($result);

@@ -89,7 +89,7 @@ class Availability{
         $year = $this->cal->year;
         if (isset($calendar[$year])){
             $cal_dates = $this->parseCalendar($calendar[$year]);    
-            $rev_dates = $this->parseReservation($reservation, $this->facility);
+            $rev_dates = $this->parseReservation($reservation);
             $dates = $cal_dates;
             foreach ($rev_dates as $d=>$v){
                 $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
