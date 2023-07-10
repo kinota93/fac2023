@@ -13,6 +13,7 @@ class Availability{
         $this->cal = new KsuCalendar($year, $month);
         $this->facility = $facility;
     }
+    
     public function parseCalendar($calendar, $holiday='定休日',$workday='営業日')
     {
         $dates = [];
@@ -25,8 +26,7 @@ class Availability{
                         $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
                     }
                 }
-            } else 
-            if (!isset($day['month']) or
+            } elseif (!isset($day['month']) or
                 (isset($day['month']) and in_array($this->cal->month, $day['month'])) ){
             // 定休日[定休曜日]・営業日[営業曜日]
                 $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
@@ -41,7 +41,7 @@ class Availability{
         return $dates;
     }
 
-       public function parseFacility($dat_facility)
+    public function parseFacility($dat_facility)
     {
         if (!isset($dat_facility[$this->facility])) return null;
         $rs = [];
@@ -71,8 +71,8 @@ class Availability{
             list($y, $m, $d) = explode('-', $rev['date']);
             if ($y==$this->cal->year and $m==$this->cal->month){
                 $rs = ['type'=>'event', 'name'=>$rev['event']];
-                if (isset($rev['timeslot'])) $rs['timeslot']=$rev['timeslot'];
-                if (isset($rev['timespan'])) $rs['timespan']=$rev['timespan'];
+                if (isset($rev['timeslot'])) $rs['timeslot'] = $rev['timeslot'];
+                if (isset($rev['timespan'])) $rs['timespan'] = $rev['timespan'];
                 $dates[$d][] =  $rs;
             }
         }
@@ -97,7 +97,7 @@ class Availability{
     function output($dates)
     {
         $days = range(1, $this->cal->lastday);
-        $wdays = array_map([$this->cal,'day2wk'], $days);
+        $wdays = array_map([$this->cal,'day2wkday'], $days);
         $names =["日", "月", "火", "水", "木", "金", "土"];
         for ($i= 0; $i< $this->cal->lastday; $i++){
             $d = $days[$i];

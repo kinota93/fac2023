@@ -15,7 +15,7 @@ class Util{
     } 
 
     /** 
-     * product(): cartesion product of uniqie element from two arrays
+     * product(): cartesion product of uniqie elements from two arrays
      */
     public static function product($array1, $array2)
     {
