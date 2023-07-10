@@ -2,6 +2,7 @@
 namespace kcal;
 
 require_once 'KsuCalendar.php';
+require_once 'Utility.php';
 
 class Availability{
     public $cal;
@@ -29,8 +30,8 @@ class Availability{
                 (isset($day['month']) and in_array($this->cal->month, $day['month'])) ){
             // 定休日[定休曜日]・営業日[営業曜日]
                 $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
-                $wday = self::_valid_array($day['weekday']);
-                $week = self::_valid_array($day['week']) ;
+                $wday = Util::valid_array($day['weekday'], range(0,6));
+                $week = Util::valid_array($day['week'], range(1, $this->cal->n_weeks)) ;
                 $days = $this->cal->filter($week, $wday);   
                 foreach ($days as $d){
                     $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
@@ -40,13 +41,7 @@ class Availability{
         return $dates;
     }
 
-    private static function _valid_array($array, $empty=[])
-    {
-        if (!is_array($array)) return [$array];
-        return empty($array) ? $empty : $array;
-    }   
-
-    public function parseFacility($dat_facility)
+       public function parseFacility($dat_facility)
     {
         if (!isset($dat_facility[$this->facility])) return null;
         $rs = [];
