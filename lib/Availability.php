@@ -26,9 +26,10 @@ class Availability{
                         $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
                     }
                 }
-            } elseif (!isset($day['month']) or
+            } else
+            if (!isset($day['month']) or
                 (isset($day['month']) and in_array($this->cal->month, $day['month'])) ){
-            // 定休日[定休曜日]・営業日[営業曜日]
+                // 曜日で与えられた定休日・営業日    
                 $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
                 $wday = Util::valid_array($day['weekday'], range(0,6));
                 $week = Util::valid_array($day['week'], range(1, $this->cal->n_weeks)) ;
