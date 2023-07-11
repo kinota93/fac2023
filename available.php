@@ -1,4 +1,7 @@
 <?php
+
+use kcal\KsuCalendar;
+
 require_once 'lib/KsuCalendar.php';
 require_once 'lib/Availability.php';
 
@@ -14,8 +17,9 @@ $dat_calendar = include('dat/php/dat_calendar.php');
 $dat_reservation = include('dat/php/dat_reservation.php');   
 $dat_facility = include('dat/php/dat_facilities.php');
 
-$avl = new kcal\Availability($year, $month, $facility);
-$dates = $avl->getAvailability($dat_calendar, $dat_reservation);
+$cal = new kcal\KsuCalendar($year, $month);
+$avl = new kcal\Availability($cal, $facility);
+
 $fac = $avl->parseFacility($dat_facility);
 
 echo "facility: ", $facility, "\n";
@@ -31,22 +35,17 @@ if ($fac){
 }
 echo "\n";
 
-
-printf("%d年%d月\n=========\n", $avl->cal->year, $avl->cal->month);
+printf("%d年%d月\n=========\n", $cal->year, $cal->month);
+$dates = $avl->getAvailability($dat_calendar, $dat_reservation);
 $avl->output($dates);
 
-/*
+
+echo "\n\n";
+echo "Test filter(): \n";
+echo "=============\n";
 $week = [1,2,5];
 $wday = [0,6];
-echo "\n";
-printf("filter(\$week=[%s],\$wday=[%s])\n========\n", implode(',', $week),implode(',', $wday));
-$days = $avl->cal->filter($week, $wday);
+printf("filter(\$week=[%s],\$wday=[%s])\n", implode(',', $week),implode(',', $wday));
+$days = $cal->filter($week, $wday);
 sort($days);
 print_r($days);
-
-echo "\n";
-printf("slice(\$week=[%s],\$wday=[%s])\n========\n", implode(',', $week),implode(',', $wday));
-$days = $avl->cal->slice($week, $wday);
-sort($days);
-print_r($days);
-*/

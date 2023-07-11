@@ -22,8 +22,10 @@ class KsuCalendar
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
-    /** filter() : extact days of the specified weekdays  
+    /** filter() : extact dates of the specified weekdays  
      * ex) filter([1,3],[2,4]): the first and third Tuesday and Thursday in the month
+     * ex) filter(2, [1,3]) : get the date of the second Monday and Wednesday
+     * ex) filter(2, 1) : get the date of the second Monday
     */
     public function filter($week, $wday=[])
     {    
@@ -32,35 +34,15 @@ class KsuCalendar
         $wday = Util::valid_array($wday, range(0, 6));
         foreach (Util::product($week, $wday) as [$wk, $wd]){
             $day = $this->wkday2day($wd, $wk);
-            if ($day <= $this->lastday) $days[] = $day;
+            if ( $this->isValid($day) ) $days[] = $day;
         };
         return $days;
     } 
 
-    /** slice() function: extract weekdays of the specified weeks  
-     * ex) slice([1,3], [2,4]) Tuesday and Thursday in the first and third weeks (if exists)
-    */
-    public function slice($week, $wday=[])
-    {
-        $days = [];
-        $week = Util::valid_array($week, range(1, $this->n_weeks));
-        $wday = Util::valid_array($wday, range(0, 6));    
-        foreach (Util::product($week, $wday) as [$wk, $wd]){
-            $wk = ($wd >= $this->firstwday) ? $wk : $wk -1;
-            if ($wk >= 1) {
-                $day = $this->wkday2day($wd, $wk);
-                if ($day <= $this->lastday) $days[] = $day;
-            }
-        };
-        return $days;
-    }
-
     /** wkday2day() : compute the day of the `$i`th `$wday` */
-    public function wkday2day($wday, $i=1)
+    public function wkday2day($wday, $i = 1)
     {   
-        if ($wday >= $this->firstwday) {
-            return $i * 7 - $this->firstwday + $wday - 6;
-        }
+        $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
         return $i * 7 - $this->firstwday + $wday + 1;
     }
 
@@ -68,5 +50,20 @@ class KsuCalendar
     public function day2wkday($day)
     {
         return ($this->firstwday + $day -1) % 7;
+    }
+
+    public function isValid($d, $flag='DAY')
+    {
+        if ($flag==='DAY')
+            return (1 <= $d and $d <= $this->lastday);
+        if ($flag==='WEEK')
+            return (1 <= $d and $d <= $this->n_weeks);
+        if ($flag==='WDAY')
+            return (0 <= $d and $d <= 6);
+    }
+    
+    public function getHolidays()
+    {
+
     }
 }

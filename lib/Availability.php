@@ -1,23 +1,23 @@
 <?php
 namespace kcal;
 
-require_once 'KsuCalendar.php';
+// require_once 'KsuCalendar.php';
 require_once 'Utility.php';
 
 class Availability{
     public $cal;
     public $facility;
 
-    public function __construct($year, $month, $facility)
+    public function __construct($calendar, $facility)
     {
-        $this->cal = new KsuCalendar($year, $month);
+        $this->cal = $calendar;
         $this->facility = $facility;
     }
     
-    public function parseCalendar($calendar, $holiday='定休日',$workday='営業日')
+    public function parseCalendar($dat_calendar, $holiday='定休日',$workday='営業日')
     {
         $dates = [];
-        foreach ($calendar as $day){
+        foreach ($dat_calendar as $day){
             // 日付で与えられた祝日・休日・営業日
             if (isset($day['days'])){
                 foreach ($day['days'] as $md=>$name){
@@ -79,6 +79,7 @@ class Availability{
         }
         return $dates;
     }
+    
     public function getAvailability($calendar, $reservation)
     {
         $dates = [];
