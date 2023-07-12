@@ -7,7 +7,7 @@ return [
         ],
         [
             'name' => '成人の日',
-            'day' => ['week'=>2, 'wday' => 1],
+            'day' => ['week'=>2, 'wday' => 1], # the 2nd  Monday
         ],
     ],
     2 => [
@@ -103,7 +103,7 @@ return [
     9 => [
         [
             'name' => '敬老の日',
-            'day' => 18,
+            'day' => ['week'=>3, 'wday'=>1],
         ],
         [
             'name' => '秋分の日',
