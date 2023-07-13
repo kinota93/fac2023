@@ -86,11 +86,18 @@ class Holiday
 
         return floor($beta + 0.242194 * ($this->year - 1980) - floor(($this->year - 1980) / 4));
     } 
-    public function parseHolidays($dat_holiday)
+    public function parseHolidays($dat_holiday, $month=0)
     {
         $holidays = [];
         $ex_holiday = null;
-        foreach ($dat_holiday as $month=>$days){
+        $_holiday = [];
+        if ($month > 0){
+            if (isset($dat_holiday[$month]))
+                $_holiday[$month] =  $dat_holiday[$month];
+        }else{
+            $_holiday = $dat_holiday;
+        }
+        foreach ($_holiday as $month=>$days){
             foreach ($days as $d){
                 $valid = true;
                 if (isset($d['during'])){
