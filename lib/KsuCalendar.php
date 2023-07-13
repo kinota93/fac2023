@@ -43,7 +43,7 @@ class KsuCalendar
     public function wkday2day($wday, $i = 1)
     {   
         $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
-        return $i * 7 - $this->firstwday + $wday + 1;
+        return $i * 7 + $wday - $this->firstwday + 1;
     }
 
     /** day2wkday(): compute the weekday of `$day` */
