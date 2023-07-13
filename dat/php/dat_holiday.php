@@ -1,4 +1,9 @@
 <?php
+/**
+ * 1. at most one holiday in any specific day
+ * 2. no succssive extra holidays
+ * 3. TODO: special holiday Di between two holidays D_i-1 and D_i+1
+ */
 return [
     1=>[
         [
@@ -7,19 +12,19 @@ return [
         ],
         [
             'name' => '成人の日',
-            'day' => ['week'=>2, 'wday' => 1], # the 2nd  Monday
+            'day' => [2, 1], # 2nd Monday
         ],
     ],
     2 => [
         [
             'name' => '建国記念の日',
             'day' => 11,
-            'range' => [1966,2999]
+            'during' => [1966, 2999]
         ],
         [
             'name' => '天皇誕生日', # 令和天皇
             'day' => 23,
-            'range' => [2018,2999],
+            'during' => [2018, 2999],
         ],
     ],
     3 => [
@@ -32,15 +37,20 @@ return [
         [
             'name' => '昭和の日',
             'day' => 29,
-            'range' =>[1989,2999],
+            'during' =>[1989, 2999],
         ],
         [
             'name' => '天皇誕生日', # 昭和天皇
             'day' => 29,
-            'range' => [1910, 1988],
+            'during' => [1910, 1988],
         ],
     ],
     5 => [
+        [
+            'name' => '天皇の即位の日',
+            'day' => 1,
+            'during'=>[2019,2019]
+        ],  
         [
             'name' => '憲法記念日',
             'day' => 3,
@@ -53,33 +63,33 @@ return [
             'name' => 'こどもの日',
             'day' => 5,
         ],
-             
+   
     ],
     7 => [
         [
             'name' => '海の日',
-            'day' => ['week' => 3, 'wday' => 1],
-            'except' => [2020,2021],
+            'day' => [3, 1], # 3rd Monday
+            'except' => [2020, 2021],
         ],
         [
             'name' => '海の日',
             'day' => 22,
-            'range' => [2021, 2021],
+            'during' => [2021, 2021],
         ],
         [
             'name' => '海の日',
             'day' => 23,
-            'range' => [2020,2020],
+            'during' => [2020, 2020],
         ],
         [
             'name' => 'スポーツの日',
             'day' => 24,
-            'range' => [2020,2020]
+            'during' => [2020, 2020]
         ],  
         [
             'name' => 'スポーツの日',
             'day' => 23,
-            'range' => [2021,2021],
+            'during' => [2021, 2021],
         ],
 
     ],
@@ -87,23 +97,23 @@ return [
         [
             'name' => '山の日',
             'day' => 11,
-            'except' => [2020,2021]
+            'except' => [2020, 2021]
         ],
         [
             'name' => '山の日',
             'day' => 8,
-            'range' => [2021, 2021],
+            'during' => [2021, 2021],
         ],
         [
             'name' => '山の日',
             'day' => 10,
-            'range' => [2020,2020]
+            'during' => [2020, 2020]
         ],        
     ],
     9 => [
         [
             'name' => '敬老の日',
-            'day' => ['week'=>3, 'wday'=>1],
+            'day' => [3, 1], # 3rd Monday
         ],
         [
             'name' => '秋分の日',
@@ -114,7 +124,7 @@ return [
         [
             'name' => 'スポーツの日',
             'day' => 9,
-            'except' => [2020,2021]
+            'except' => [2020, 2021]
         ],
     ],
     11 => [
@@ -131,7 +141,7 @@ return [
         [
             'name' => '天皇誕生日', # 平成天皇
             'day' => 23,
-            'range' => [1988, 2017],
+            'during' => [1988, 2017],
         ],
     ],
 ];

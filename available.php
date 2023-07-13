@@ -16,9 +16,18 @@ $facility = isset($_GET['f'])  ? $_GET['f'] : $facility;
 $dat_calendar = include('dat/php/dat_calendar.php');
 $dat_reservation = include('dat/php/dat_reservation.php');   
 $dat_facility = include('dat/php/dat_facilities.php');
+$dat_holiday = include('dat/php/dat_holiday.php');
 
 $cal = new kcal\KsuCalendar($year, $month);
 $avl = new kcal\Availability($cal, $facility);
+
+$holidays = $cal->getHolidays($dat_holiday);
+echo "{$year}年\n";
+echo 'Total: ', count($holidays), " days\n\n";
+foreach ($holidays as $date=>$name){
+    echo $date, ': ', $name, "\n";
+}
+echo "\n\n";
 
 $fac = $avl->parseFacility($dat_facility);
 
