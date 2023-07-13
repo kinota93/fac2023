@@ -2,8 +2,9 @@
 
 use kcal\KsuCalendar;
 
-require_once 'lib/KsuCalendar.php';
-require_once 'lib/Availability.php';
+require 'lib/KsuCalendar.php';
+require 'lib/Holiday.php';
+require 'lib/Availability.php';
 
 header('Content-Type: text/plain; charset=UTF-8');
 $year =  2023;
@@ -18,10 +19,13 @@ $dat_reservation = include('dat/php/dat_reservation.php');
 $dat_facility = include('dat/php/dat_facilities.php');
 $dat_holiday = include('dat/php/dat_holiday.php');
 
+$hday = new kcal\Holiday($year, $dat_holiday );
 $cal = new kcal\KsuCalendar($year, $month);
 $avl = new kcal\Availability($cal, $facility);
 
-$holidays = $cal->getHolidays($dat_holiday);
+$holidays = $hday->getHolidays();
+//$holidays = $hday->getMonthHolidays(4);
+
 echo "{$year}年\n";
 echo 'Total: ', count($holidays), " days\n\n";
 foreach ($holidays as $date=>$name){

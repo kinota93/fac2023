@@ -1,7 +1,8 @@
 <?php
 namespace kcal;
 
-// require_once 'KsuCalendar.php';
+require_once 'KsuCalendar.php';
+require_once 'Holiday.php';
 require_once 'Utility.php';
 
 class Availability{
@@ -16,7 +17,6 @@ class Availability{
     
     public function parseCalendar($dat_calendar, $holiday='定休日',$workday='営業日')
     {
-        $dates = [];
         foreach ($dat_calendar as $day){
             // 日付で与えられた祝日・休日・営業日
             if (isset($day['days'])){
@@ -26,7 +26,7 @@ class Availability{
                         $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
                     }
                 }
-            } else
+            }else
             if (!isset($day['month']) or
                 (isset($day['month']) and in_array($this->cal->month, $day['month'])) ){
                 // 曜日で与えられた定休日・営業日    
