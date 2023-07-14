@@ -17,7 +17,7 @@ class Availability{
         $this->facility = $facility;
     }
 
-    /** Schedule of business [week]days and non-business [week]days */
+    /** Calendar of business [week]days, non-business [week]days */
     public function parseCalendar($dat_calendar, $holiday='定休日',$workday='営業日')
     {
         $month = $this->calendar->month;
@@ -35,7 +35,7 @@ class Availability{
                             $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
                     $week = array_unique($day['week']);
                     $wday = array_unique($day['wday']);                
-                    $days = $this->calendar->filter($week, $wday);   
+                    $days = $this->calendar->select($week, $wday);   
                     foreach ($days as $d){
                         $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
                     }

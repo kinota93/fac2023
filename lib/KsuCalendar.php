@@ -21,12 +21,12 @@ class KsuCalendar
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
-    /** filter() : extract dates of the specified weekdays  
-     * ex) filter([1,3],[2,4]): the first and third Tuesday and Thursday in the month
-     * ex) filter(2, [1,3]) : get the date of the second Monday and Wednesday
-     * ex) filter(2, 1) : get the date of the second Monday
+    /** select() : extract dates of the specified weekdays  
+     * ex) select([1,3],[2,4]): the first and third Tuesday and Thursday
+     * ex) select(2, [1,3]) : the second Monday and Wednesday
+     * ex) select(3, 4) :  the third Thursday
     */
-    public function filter($week, $wday=[])
+    public function select($week, $wday=[])
     {    
         $days = [];
         if (is_scalar($week)) $week = [$week];
@@ -41,19 +41,20 @@ class KsuCalendar
         return $days;
     } 
 
-    /** w2d() : weekday to day transform */
+    /** w2d() : transform weekday to day  */
     public function w2d($wday, $i = 1)
     {   
         $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
         return $i * 7 + $wday - $this->firstwday + 1;
     }
 
-    /** d2w(): day to weekday transform */
+    /** d2w(): transform day to weekday */
     public function d2w($day)
     {
         return ($this->firstwday + $day -1) % 7;
     }
 
+    /** is_valid(): check if it is in the valid range */
     public function is_valid($d, $flag='DAY')
     {
         if ($flag==='DAY')

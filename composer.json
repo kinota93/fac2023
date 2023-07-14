@@ -1,6 +1,6 @@
 {
   "name": "availability/facility",
-  "description":"automatic computation of availability",
+  "description":"Rule driven caculation of calendar days and availability",
   "version": "1.0.0",
   "type": "project",
   "time":"2023-6-6",
@@ -11,6 +11,11 @@
       "role" : "Developer"
     }
   ],
+  "autoload": {
+    "psr-4": {
+        "kcal\\": "lib/"
+    }
+},
   "require": {
     "php": ">=8.1",
     "symfony/yaml": "*"

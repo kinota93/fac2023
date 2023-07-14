@@ -6,17 +6,18 @@ class Holiday
 {
     public $year;
     public $holidays;
+    
     public function __construct($year, $dat_holiday)
     {
         $this->year = $year;
         $this->holidays = $this->_parseHolidays($dat_holiday);
     }
     
+    /** get holidays of one month or a whole year (default)*/
     public function getHolidays($month = 0)
     {
-        if ($month == 0) {
-            return $this->holidays;
-        }
+        if ($month == 0) return $this->holidays;
+        
         return array_filter($this->holidays, function ($x) use($month) {
                 return (int)substr($x, 0, 2) === $month;
             }, ARRAY_FILTER_USE_KEY);
@@ -49,22 +50,36 @@ class Holiday
         }
     }
 
+    /** check if there is exact one day between 2 dates, 
+     * e.g., sandwiched('03-31', '05-02')
+    */
     function sandwiched($date1, $date2)
     {
         return $date2 === $this->mkdate($date1, +2);
     }
+
+    /** make a properly formatted new date by moving back/ahead some days, 
+     * e.g., mkdate('2-14', 3) is '02-17', mkdate('3-31',2) = '04-02'
+    */
     function mkdate ($date, $days=0)
     {
         list ($m, $d) = explode('-', $date);
         $time = mktime(0, 0, 0, $m, $d + $days, $this->year);
         return date('m-d',$time);
     }
+
+    /** check if all elements of array $a are defined keys of array $b, 
+     * e.g. is_defined(['tom','bob'], ['bob'=>23, 'abe'=>35, 'tom'=>56] is TRUE)
+    */
     function is_defined($a, $b)
     {
         $diff = array_diff($a, array_keys($b));
         return empty($diff); 
     }
 
+    /** check if $a is in range defeined by array $b, 
+     * e.g. during(3, [2,4]) is TRUE  
+    */
     function during($a, $b)
     {
         if (is_scalar($b))
@@ -73,6 +88,13 @@ class Holiday
             return ($b[0] <= $a and $a <= $b[1]);
         return false;
     }
+
+    /** parse and generate a holiday based the rule or definition.
+     * * Basically, there're 3 types:
+     * (1) fixed day, e.g., new year day,
+     * (2) specified weekday, e.g., coming of age day = 2nd Monday of January
+     * (3) others, e.g., spring/autumn equinox   
+    */
     function parseDay($month, $day)
     {
         $cal = new \kcal\KsuCalendar($this->year, $month);
@@ -86,28 +108,42 @@ class Holiday
             return  $this->equinox('autumn');
         return -1;    
     }
-    /** year          spring    autumn
+
+    /** caculate equinox days given the season and parameter $alpha, 
+     * return -1 if there is no knowledge how to calculate it  
+     * @parameter $alpha
+     *  year          spring    autumn
         1851 - 1899   19.8277   22.2588
         1900 - 1979   20.8357   23.2588
         1980 - 2099   20.8431   23.2488
         2100 - 2150   21.8510   24.2488
     */
     function equinox($season='spring'){
-        if (!$this->during($this->year, [1851, 2150])){
+        $year = $this->year;
+        if (!$this->during($year, [1851, 2150])){
             return -1;
         }
         $alpha = [20.8431, 23.2488];
-        if ($this->during($this->year, [1851, 1899]))
+        if ($this->during($year, [1851, 1899]))
             $alpha = [19.8277, 22.2588];
-        if ($this->during($this->year, [1900, 1979]))
+        if ($this->during($year, [1900, 1979]))
             $alpha = [20.8357, 23.2588];
-        if ($this->during($this->year, [2100, 2150]))
+        if ($this->during($year, [2100, 2150]))
             $alpha = [21.8510, 24.2488];
         
         $beta = ($season=='spring') ? $alpha[0] : $alpha[1];
 
-        return floor($beta + 0.242194 * ($this->year - 1980) - floor(($this->year - 1980) / 4));
+        return floor($beta + 0.242194 * ($year - 1980) - floor(($year - 1980) / 4));
     } 
+
+    /**
+     * _parseHolidays() : parse rules and generete all holidays for this year. 
+     *
+     * @param [type] $dat_holiday, rules that define various kinds of holidays
+     * @param string $ex_name, supplementary holiday for coincident holidays   
+     * @param string $sp_name, additional holiday for a noraml day sandwiched by 2 holidays
+     * @return array a list of holidays,  [mm-dd] => name
+     */
     private function _parseHolidays($dat_holiday, $ex_name='振替休日', $sp_name='国民の休日')
     {
         $holidays = [];
@@ -121,13 +157,17 @@ class Holiday
                 if (isset($d['except'])){
                     $valid = $valid && !in_array($this->year, $d['except']);
                 }
+                if (isset($d['in'])){
+                    $valid = $valid && in_array($this->year, $d['in']);
+                }
                 if ($valid) {
                     $hday = $this->parseDay($_month, $d['day']);
                     
                     if ($hday > 0){
                         $date = (new \DateTime)->setDate($this->year, $_month, $hday);
                         
-                        if ($ex_holiday!=null ){ // for a pending ex. holiday 
+                        // supplementary holiday for coincident holidays
+                        if ($ex_holiday != null ){ // for a pending ex_holiday 
                             if ($ex_holiday === $date){
                                 $ex_holiday->modify('+1 day');
                             }else{
@@ -138,7 +178,7 @@ class Holiday
                         $holidays[$date->format('m-d')] = $d['name'];
                         $cal = new KsuCalendar($this->year, $_month);   
                         $wday = $cal->d2w($hday);
-                        if ($wday === 0) { // set a new ex. hodilday
+                        if ($wday === 0) { // prepare a new ex_hodilday
                             $ex_holiday = (new \DateTime)->setDate($this->year, $_month, $hday +1);
                         }
                         
@@ -147,9 +187,8 @@ class Holiday
             }
         }
         ksort($holidays);
-        /** 
-         * special holiday, a day sandwiched by two holidays
-         * */
+        
+        // additional holiday, a normal day (rarely) sandwiched by two holidays
         $ex_holidays =[];
         $prev_date = null;
         foreach ($holidays as $date=>$name){
