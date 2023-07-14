@@ -1,8 +1,7 @@
 <?php
 /**
- * 1. at most one holiday in any specific day
- * 2. no succssive extra holidays
- * 3. TODO: special holiday Di between two holidays D_i-1 and D_i+1
+ * 1. at most one holiday for each day
+ * 2. special holiday i sandwiched by day i-1 and day i+1
  */
 return [
     1=>[
@@ -19,12 +18,12 @@ return [
         [
             'name' => '建国記念の日',
             'day' => 11,
-            'during' => [1966, 2999]
+            'during' => [1966, 2999] # 2999 for reasonable future
         ],
         [
             'name' => '天皇誕生日', # 令和天皇
             'day' => 23,
-            'during' => [2018, 2999],
+            'during' => [2018, 2999], 
         ],
     ],
     3 => [
@@ -42,7 +41,7 @@ return [
         [
             'name' => '天皇誕生日', # 昭和天皇
             'day' => 29,
-            'during' => [1910, 1988],
+            'during' => [1910, 1988], # a range of years bound-inclusive 
         ],
     ],
     5 => [
@@ -69,7 +68,7 @@ return [
         [
             'name' => '海の日',
             'day' => [3, 1], # 3rd Monday
-            'except' => [2020, 2021],
+            'except' => [2020, 2021], # a set of years
         ],
         [
             'name' => '海の日',
