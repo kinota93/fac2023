@@ -81,7 +81,7 @@ class Holiday
         if (is_array($day))
             return $cal->w2d($day[1], $day[0]);
         if ($day==='springEquinox')
-            return  $this->equinox();
+            return  $this->equinox('spring');
         if ($day==='autumnEquinox')
             return  $this->equinox('autumn');
         return -1;    
@@ -108,7 +108,7 @@ class Holiday
 
         return floor($beta + 0.242194 * ($this->year - 1980) - floor(($this->year - 1980) / 4));
     } 
-    private function _parseHolidays($dat_holiday)
+    private function _parseHolidays($dat_holiday, $ex_name='振替休日', $sp_name='国民の休日')
     {
         $holidays = [];
         $ex_holiday = null;
@@ -131,7 +131,7 @@ class Holiday
                             if ($ex_holiday === $date){
                                 $ex_holiday->modify('+1 day');
                             }else{
-                                $holidays[$ex_holiday->format('m-d')] = '振替休日';
+                                $holidays[$ex_holiday->format('m-d')] = $ex_name;
                                 $ex_holiday = null;
                             }
                         }
@@ -155,7 +155,7 @@ class Holiday
         foreach ($holidays as $date=>$name){
             if ($prev_date and $this->sandwiched($prev_date, $date)){
                 $middle = $this->mkdate($prev_date, +1);
-                $ex_holidays[$middle] = '国民の休日';
+                $ex_holidays[$middle] = $sp_name;
             }
             $prev_date = $date;
         }
