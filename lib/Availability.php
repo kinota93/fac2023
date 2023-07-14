@@ -5,36 +5,40 @@ require_once 'KsuCalendar.php';
 require_once 'Holiday.php';
 
 class Availability{
-    public $cal;
+    public $calendar;
+    public $holiday;
+
     public $facility;
 
-    public function __construct($calendar, $facility)
+    public function __construct($calendar, $holiday ,$facility)
     {
-        $this->cal = $calendar;
+        $this->calendar = $calendar;
+        $this->holiday  = $holiday;
         $this->facility = $facility;
     }
-    
+
+    /** Schedule of business [week]days and non-business [week]days */
     public function parseCalendar($dat_calendar, $holiday='定休日',$workday='営業日')
     {
+        $month = $this->calendar->month;
         foreach ($dat_calendar as $day){
-            // 日付で与えられた祝日・休日・営業日
-            if (isset($day['days'])){
-                foreach ($day['days'] as $md=>$name){
+            if (isset($day['days'])){// 日付で与えられた臨時休日・臨時営業日
+                foreach ($day['days'] as $md => $name){
                     list($m, $d) = explode('-', $md);
-                    if ($m == $this->cal->month) {
-                        $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
+                    if ($m == $month) {
+                        $dates[$d][] = ['type' => $day['type'], 'name' => $name];
                     }
                 }
-            }else
-            if (!isset($day['month']) or
-                (isset($day['month']) and in_array($this->cal->month, $day['month'])) ){
-                // 曜日で与えられた定休日・営業日    
-                $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
-                $wday = empty($day['wday']) ? range(0, 6) : array_values(array_unique($day['wday']));
-                $week = empty($day['week']) ? range(1, $this->cal->n_weeks) : array_values(array_unique($day['week']));
-                $days = $this->cal->filter($week, $wday);   
-                foreach ($days as $d){
-                    $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
+            }else{ // 曜日で与えられた定休日・営業日
+                if (!isset($day['month']) or (isset($day['month']) and 
+                        in_array($month, $day['month']))){
+                            $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
+                    $week = array_unique($day['week']);
+                    $wday = array_unique($day['wday']);                
+                    $days = $this->calendar->filter($week, $wday);   
+                    foreach ($days as $d){
+                        $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
+                    }
                 }
             }
         }
@@ -66,10 +70,12 @@ class Availability{
     public function parseReservation($reservation)
     {
         $dates = [];
+        $year = $this->calendar->year;
+        $month = $this->calendar->month;
         foreach ($reservation as $rev){
             if ($rev['facility_id'] != $this->facility) continue;
             list($y, $m, $d) = explode('-', $rev['date']);
-            if ($y==$this->cal->year and $m==$this->cal->month){
+            if ($y==$year and $m==$month){
                 $rs = ['type'=>'event', 'name'=>$rev['event']];
                 if (isset($rev['timeslot'])) $rs['timeslot'] = $rev['timeslot'];
                 if (isset($rev['timespan'])) $rs['timespan'] = $rev['timespan'];
@@ -82,25 +88,36 @@ class Availability{
     public function getAvailability($calendar, $reservation)
     {
         $dates = [];
-        $year = $this->cal->year;
+        $year = $this->calendar->year;
+        $month = $this->calendar->month;
+        // 国民の休日・祝日
+        $holidays = $this->holiday->getHolidays($month);
+        foreach($holidays as $md => $name){
+            list($_, $d) = explode('-', $md);
+            $dates[(int)$d][] = ['type' => 'public_holiday', 'name' => $name];
+        }
+        // 定休日・営業日
         if (isset($calendar[$year])){
             $cal_dates = $this->parseCalendar($calendar[$year]);    
             $rev_dates = $this->parseReservation($reservation);
-            $dates = $cal_dates;
+            foreach ($cal_dates as $d=>$v){
+                $dates[(int)$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
+            }
             foreach ($rev_dates as $d=>$v){
-                $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
+                $dates[(int)$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
             }
         } 
-        ksort($dates);
+        ksort($dates);        
+
         return $dates;
     }
 
     function output($dates)
     {
-        $days = range(1, $this->cal->lastday);
-        $wdays = array_map([$this->cal,'d2w'], $days);
+        $days = range(1, $this->calendar->lastday);
+        $wdays = array_map([$this->calendar,'d2w'], $days);
         $names =["日", "月", "火", "水", "木", "金", "土"];
-        for ($i= 0; $i< $this->cal->lastday; $i++){
+        for ($i= 0; $i< $this->calendar->lastday; $i++){
             $d = $days[$i];
             $w = $wdays[$i];
             printf( "%02d(%s):\n",$d, $names[$w]);

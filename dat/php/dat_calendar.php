@@ -3,6 +3,7 @@ return
 [
     2023=> 
     [
+        /*
         [  
             'type' => 'public_holiday',
             'days' => [
@@ -25,12 +26,12 @@ return
                 '11-23' => '勤労感謝の日',
             ]
         ],
-
+        */
         [
             'type' => 'local_holiday',
             'month' => [4,5,6,7,8,9,10,11,12],
             'week' => [2,4],
-            'weekday' => [2,3],
+            'wday' => [2,3],
         ],    
         
         [   

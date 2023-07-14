@@ -6,51 +6,46 @@ class Holiday
 {
     public $year;
     public $holidays;
-    public $dat_holiday;
     public function __construct($year, $dat_holiday)
     {
         $this->year = $year;
-        $this->dat_holiday = $dat_holiday;
-        $this->holidays = $this->parseHolidays();
+        $this->holidays = $this->_parseHolidays($dat_holiday);
     }
     
-    function getMonthHolidays($month=0)
+    public function getHolidays($month = 0)
     {
         if ($month == 0) {
             return $this->holidays;
         }
         return array_filter($this->holidays, function ($x) use($month) {
-                return (int)substr($x, 0, 2)===$month;
+                return (int)substr($x, 0, 2) === $month;
             }, ARRAY_FILTER_USE_KEY);
     }
-    function getHolidays()
-    {
-        return $this->holidays;
-    }
+   
 
-    /** query by name with pattern matching  */
-    function queryByname($name){
+    /** query by name, support pattern matching  */
+    public function queryByname($name){
         return array_filter($this->holidays,function($v) use($name){
             return preg_match("/{$name}/", $v);
         });
     }
 
-    /** query by date, can guess date format */
-    function queryBydate($date){
+    /** query by date, guess date format */
+    public function queryBydate($date){
         $date = self::guessDate($date);
         return array_filter($this->holidays,function($v) use($date){
             return $v === trim($date);
         }, ARRAY_FILTER_USE_KEY);                
     }
 
-    /** guess '02-11' from '0211', '2-11' etc   */
+    /** guess date format, eg. '02-11', '0211', '2-11' all the same   */
     static function guessDate($date){
         if (preg_match('/[0-9]+-[0-9]+/', $date)){
-            list($m,$d) = explode('-',$date);
+            list($m, $d) = explode('-', $date);
             return sprintf("%02d-%02d", $m, $d);
         }
         if (preg_match('/[0-9]{4}/', $date)){
-            return substr($date,0,2) .'-'.substr($date,2,2);
+            return substr($date, 0, 2) .'-'.substr($date, 2, 2);
         }
     }
 
@@ -113,12 +108,11 @@ class Holiday
 
         return floor($beta + 0.242194 * ($this->year - 1980) - floor(($this->year - 1980) / 4));
     } 
-    public function parseHolidays($month = 0)
+    private function _parseHolidays($dat_holiday)
     {
         $holidays = [];
         $ex_holiday = null;
-        $_holiday = $this->dat_holiday;        
-        foreach ($_holiday as $_month=>$_days){
+        foreach ($dat_holiday as $_month=>$_days){
             foreach ($_days as $d){
                 $valid = true;
                 if (isset($d['during'])){
@@ -170,6 +164,4 @@ class Holiday
       
         return $holidays;
     }
-
-
 }

@@ -21,20 +21,7 @@ $dat_holiday = include('dat/php/dat_holiday.php');
 
 $h = new kcal\Holiday($year, $dat_holiday );
 $cal = new kcal\KsuCalendar($year, $month);
-$avl = new kcal\Availability($cal, $facility);
-
-// $holidays = $hday->getHolidays(); // one year
-$holidays = $h->getMonthHolidays(5); // one month
-
-echo "{$year}年\n";
-echo 'Total: ', count($holidays), " days\n\n";
-print_r($holidays);
-
-$holidays = $h->queryByname('休日'); // pattern match
-print_r($holidays);
-
-$holidays = $h->queryBydate('2-11');// figure out '02-11', '0211', '2-11'.  
-print_r($holidays);
+$avl = new kcal\Availability($cal,$h, $facility);
 
 $fac = $avl->parseFacility($dat_facility);
 
@@ -55,13 +42,37 @@ printf("%d年%d月\n=========\n", $cal->year, $cal->month);
 $dates = $avl->getAvailability($dat_calendar, $dat_reservation);
 $avl->output($dates);
 
+echo "\n\n";
+echo "*** UNIT TESTS ***\n\n";
+echo "(*) Holiday::getHolidays():\n";
+echo "==========================\n";
+$holidays = $h->getHolidays(); // one year
+print_r($holidays);
+echo "Total ", count($holidays), "days\n";
 
 echo "\n\n";
-echo "Test filter(): \n";
-echo "=============\n";
+echo "(*) Holiday::getHolidays(5):\n";
+echo "===========================\n";
+$holidays = $h->getHolidays(5); // one month
+print_r($holidays);
+
+echo "\n\n";
+echo "(*) Holiday::queryByname('休日'): [partial martching] \n";
+echo "================================\n";
+$holidays = $h->queryByname('休日'); // pattern match
+print_r($holidays);
+
+echo "\n\n";
+echo "(*) Holiday::queryBydate('2-11'): [format inference]\n";
+echo "================================\n";
+$holidays = $h->queryBydate('2-11');// figure out '02-11', '0211', '2-11'.  
+print_r($holidays);
+
+echo "\n\n";
 $week = [1,2,5];
 $wday = [0,6];
-printf("filter(\$week=[%s],\$wday=[%s])\n", implode(',', $week),implode(',', $wday));
+printf("(*) KsuCalendar::filter([%s], [%s])\n",implode(',',$week),implode(',',$wday),);
+echo "================================\n";
 $days = $cal->filter($week, $wday);
 sort($days);
 print_r($days);

@@ -21,7 +21,7 @@ class KsuCalendar
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
-    /** filter() : extact dates of the specified weekdays  
+    /** filter() : extract dates of the specified weekdays  
      * ex) filter([1,3],[2,4]): the first and third Tuesday and Thursday in the month
      * ex) filter(2, [1,3]) : get the date of the second Monday and Wednesday
      * ex) filter(2, 1) : get the date of the second Monday
@@ -29,7 +29,9 @@ class KsuCalendar
     public function filter($week, $wday=[])
     {    
         $days = [];
-        $wday =  empty($wday) ? range(0, 6) : array_values(array_unique($wday));
+        if (is_scalar($week)) $week = [$week];
+        if (is_scalar($week)) $wday = [$wday];
+        $wday =  empty($wday) ? range(0, 6) : array_unique($wday);
         foreach ($week as $wk ){
             foreach ($wday as $wd){
                 $day = $this->w2d($wd, $wk);
@@ -39,14 +41,14 @@ class KsuCalendar
         return $days;
     } 
 
-    /** wkday2day() : compute the day of the `$i`th `$wday` */
+    /** w2d() : weekday to day transform */
     public function w2d($wday, $i = 1)
     {   
         $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
         return $i * 7 + $wday - $this->firstwday + 1;
     }
 
-    /** day2wkday(): compute the weekday of `$day` */
+    /** d2w(): day to weekday transform */
     public function d2w($day)
     {
         return ($this->firstwday + $day -1) % 7;
