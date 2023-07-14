@@ -3,7 +3,6 @@ namespace kcal;
 
 require_once 'KsuCalendar.php';
 require_once 'Holiday.php';
-require_once 'Utility.php';
 
 class Availability{
     public $cal;
@@ -31,8 +30,8 @@ class Availability{
                 (isset($day['month']) and in_array($this->cal->month, $day['month'])) ){
                 // 曜日で与えられた定休日・営業日    
                 $name = substr($day['type'],-7)=='holiday' ? $holiday : $workday;
-                $wday = Util::valid_array($day['weekday'], range(0,6));
-                $week = Util::valid_array($day['week'], range(1, $this->cal->n_weeks)) ;
+                $wday = empty($day['wday']) ? range(0, 6) : array_values(array_unique($day['wday']));
+                $week = empty($day['week']) ? range(1, $this->cal->n_weeks) : array_values(array_unique($day['week']));
                 $days = $this->cal->filter($week, $wday);   
                 foreach ($days as $d){
                     $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
@@ -99,7 +98,7 @@ class Availability{
     function output($dates)
     {
         $days = range(1, $this->cal->lastday);
-        $wdays = array_map([$this->cal,'day2wkday'], $days);
+        $wdays = array_map([$this->cal,'d2w'], $days);
         $names =["日", "月", "火", "水", "木", "金", "土"];
         for ($i= 0; $i< $this->cal->lastday; $i++){
             $d = $days[$i];

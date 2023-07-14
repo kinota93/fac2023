@@ -23,15 +23,18 @@ $hday = new kcal\Holiday($year, $dat_holiday );
 $cal = new kcal\KsuCalendar($year, $month);
 $avl = new kcal\Availability($cal, $facility);
 
-$holidays = $hday->getHolidays();
-//$holidays = $hday->getMonthHolidays(4);
+// $holidays = $hday->getHolidays(); // one year
+$holidays = $hday->getMonthHolidays(5); // one month
 
 echo "{$year}年\n";
 echo 'Total: ', count($holidays), " days\n\n";
-foreach ($holidays as $date=>$name){
-    echo $date, ': ', $name, "\n";
-}
-echo "\n\n";
+print_r($holidays);
+
+$holidays = $hday->queryByname('休日'); // pattern match
+print_r($holidays);
+
+$holidays = $hday->queryBydate('2-11');// figure out '02-11', '0211', '2-11'.  
+print_r($holidays);
 
 $fac = $avl->parseFacility($dat_facility);
 

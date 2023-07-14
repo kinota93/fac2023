@@ -6,27 +6,54 @@ class Holiday
 {
     public $year;
     public $holidays;
+    public $dat_holiday;
     public function __construct($year, $dat_holiday)
     {
         $this->year = $year;
-        $this->holidays = $this->parseHolidays($dat_holiday);
+        $this->dat_holiday = $dat_holiday;
+        $this->holidays = $this->parseHolidays();
     }
     
-    function getMonthHolidays($month)
+    function getMonthHolidays($month=0)
     {
-       $dates = array_filter($this->holidays, function($x) use ($month){
-            return (int)substr($x, 0, 2) === $month;
-        }, ARRAY_FILTER_USE_KEY);
-        $rs = [];
-        foreach ($dates as $date => $name){
-            $rs[(int)substr($date,3)] = $name;
+        if ($month == 0) {
+            return $this->holidays;
         }
-        return $rs;
+        return array_filter($this->holidays, function ($x) use($month) {
+                return (int)substr($x, 0, 2)===$month;
+            }, ARRAY_FILTER_USE_KEY);
     }
     function getHolidays()
     {
         return $this->holidays;
     }
+
+    /** query by name with pattern matching  */
+    function queryByname($name){
+        return array_filter($this->holidays,function($v) use($name){
+            return preg_match("/{$name}/", $v);
+        });
+    }
+
+    /** query by date, can guess date format */
+    function queryBydate($date){
+        $date = self::guessDate($date);
+        return array_filter($this->holidays,function($v) use($date){
+            return $v === trim($date);
+        }, ARRAY_FILTER_USE_KEY);                
+    }
+
+    /** guess '02-11' from '0211', '2-11' etc   */
+    static function guessDate($date){
+        if (preg_match('/[0-9]+-[0-9]+/', $date)){
+            list($m,$d) = explode('-',$date);
+            return sprintf("%02d-%02d", $m, $d);
+        }
+        if (preg_match('/[0-9]{4}/', $date)){
+            return substr($date,0,2) .'-'.substr($date,2,2);
+        }
+    }
+
     function sandwiched($date1, $date2)
     {
         return $date2 === $this->mkdate($date1, +2);
@@ -57,7 +84,7 @@ class Holiday
         if (is_integer($day))
             return $day;
         if (is_array($day))
-            return $cal->wkday2day($day[1], $day[0]);
+            return $cal->w2d($day[1], $day[0]);
         if ($day==='springEquinox')
             return  $this->equinox();
         if ($day==='autumnEquinox')
@@ -86,19 +113,13 @@ class Holiday
 
         return floor($beta + 0.242194 * ($this->year - 1980) - floor(($this->year - 1980) / 4));
     } 
-    public function parseHolidays($dat_holiday, $month=0)
+    public function parseHolidays($month = 0)
     {
         $holidays = [];
         $ex_holiday = null;
-        $_holiday = [];
-        if ($month > 0){
-            if (isset($dat_holiday[$month]))
-                $_holiday[$month] =  $dat_holiday[$month];
-        }else{
-            $_holiday = $dat_holiday;
-        }
-        foreach ($_holiday as $month=>$days){
-            foreach ($days as $d){
+        $_holiday = $this->dat_holiday;        
+        foreach ($_holiday as $_month=>$_days){
+            foreach ($_days as $d){
                 $valid = true;
                 if (isset($d['during'])){
                     $valid = $valid && $this->during($this->year, $d['during']);
@@ -107,10 +128,10 @@ class Holiday
                     $valid = $valid && !in_array($this->year, $d['except']);
                 }
                 if ($valid) {
-                    $hday = $this->parseDay($month, $d['day']);
+                    $hday = $this->parseDay($_month, $d['day']);
                     
                     if ($hday > 0){
-                        $date = (new \DateTime)->setDate($this->year, $month, $hday);
+                        $date = (new \DateTime)->setDate($this->year, $_month, $hday);
                         
                         if ($ex_holiday!=null ){ // for a pending ex. holiday 
                             if ($ex_holiday === $date){
@@ -121,10 +142,10 @@ class Holiday
                             }
                         }
                         $holidays[$date->format('m-d')] = $d['name'];
-                        $cal = new KsuCalendar($this->year, $month);   
-                        $wday = $cal->day2wkday($hday);
+                        $cal = new KsuCalendar($this->year, $_month);   
+                        $wday = $cal->d2w($hday);
                         if ($wday === 0) { // set a new ex. hodilday
-                            $ex_holiday = (new \DateTime)->setDate($this->year, $month, $hday +1);
+                            $ex_holiday = (new \DateTime)->setDate($this->year, $_month, $hday +1);
                         }
                         
                     }    
@@ -146,7 +167,7 @@ class Holiday
         }
         $holidays = array_merge($holidays, $ex_holidays);
         ksort($holidays);
-    
+      
         return $holidays;
     }
 

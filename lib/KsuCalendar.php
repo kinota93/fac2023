@@ -1,7 +1,6 @@
 <?php
 namespace kcal;
 
-include_once 'Utility.php';
 class KsuCalendar
 {
     public $year;// @var year
@@ -18,7 +17,7 @@ class KsuCalendar
         $this->month = (int)date('m', $time);         
         $this->lastday = (int)date('t', $time);
         $this->firstwday = (int)date('w', $time);
-        $this->lastwday = $this->day2wkday($this->lastday);
+        $this->lastwday = $this->d2w($this->lastday);
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
@@ -30,29 +29,30 @@ class KsuCalendar
     public function filter($week, $wday=[])
     {    
         $days = [];
-        $week = Util::valid_array($week, range(1, $this->n_weeks));
-        $wday = Util::valid_array($wday, range(0, 6));
-        foreach (Util::product($week, $wday) as [$wk, $wd]){
-            $day = $this->wkday2day($wd, $wk);
-            if ( $this->isValid($day) ) $days[] = $day;
+        $wday =  empty($wday) ? range(0, 6) : array_values(array_unique($wday));
+        foreach ($week as $wk ){
+            foreach ($wday as $wd){
+                $day = $this->w2d($wd, $wk);
+                if ( $this->is_valid($day) ) $days[] = $day;
+            }
         };
         return $days;
     } 
 
     /** wkday2day() : compute the day of the `$i`th `$wday` */
-    public function wkday2day($wday, $i = 1)
+    public function w2d($wday, $i = 1)
     {   
         $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
         return $i * 7 + $wday - $this->firstwday + 1;
     }
 
     /** day2wkday(): compute the weekday of `$day` */
-    public function day2wkday($day)
+    public function d2w($day)
     {
         return ($this->firstwday + $day -1) % 7;
     }
 
-    public function isValid($d, $flag='DAY')
+    public function is_valid($d, $flag='DAY')
     {
         if ($flag==='DAY')
             return (1 <= $d and $d <= $this->lastday);
