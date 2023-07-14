@@ -1,5 +1,5 @@
 ![Logo](kscal_sm.png)
-# KsCal: A rule-based calendar library in pure PHP  
+# KsCal: A rule-based calendar PHP library
 
 # Introduction
 
