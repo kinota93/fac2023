@@ -3,7 +3,7 @@ return
 [
     2023=> 
     [
-        /*
+    /* public holidays can be now auto-computed
         [  
             'type' => 'public_holiday',
             'days' => [
@@ -26,7 +26,7 @@ return
                 '11-23' => '勤労感謝の日',
             ]
         ],
-        */
+    */
         [
             'type' => 'local_holiday',
             'month' => [4,5,6,7,8,9,10,11,12],
