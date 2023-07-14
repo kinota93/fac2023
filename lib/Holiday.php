@@ -146,7 +146,7 @@ class Holiday
                 }
             }
         }
-        
+        ksort($holidays);
         /** 
          * special holiday, a day sandwiched by two holidays
          * */
