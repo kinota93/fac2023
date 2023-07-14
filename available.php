@@ -19,21 +19,21 @@ $dat_reservation = include('dat/php/dat_reservation.php');
 $dat_facility = include('dat/php/dat_facilities.php');
 $dat_holiday = include('dat/php/dat_holiday.php');
 
-$hday = new kcal\Holiday($year, $dat_holiday );
+$h = new kcal\Holiday($year, $dat_holiday );
 $cal = new kcal\KsuCalendar($year, $month);
 $avl = new kcal\Availability($cal, $facility);
 
 // $holidays = $hday->getHolidays(); // one year
-$holidays = $hday->getMonthHolidays(5); // one month
+$holidays = $h->getMonthHolidays(5); // one month
 
 echo "{$year}年\n";
 echo 'Total: ', count($holidays), " days\n\n";
 print_r($holidays);
 
-$holidays = $hday->queryByname('休日'); // pattern match
+$holidays = $h->queryByname('休日'); // pattern match
 print_r($holidays);
 
-$holidays = $hday->queryBydate('2-11');// figure out '02-11', '0211', '2-11'.  
+$holidays = $h->queryBydate('2-11');// figure out '02-11', '0211', '2-11'.  
 print_r($holidays);
 
 $fac = $avl->parseFacility($dat_facility);
