@@ -2,10 +2,9 @@
 
 namespace kcal;
 
-/*
- *--------------------------------------------------------------------------
- * Japanese extensions to standard `DateTime` class (和暦などformatを追加)
- *    * 追加した記号
+class KsDateTime extends \DateTime{
+/* Japanese extensions to standard `DateTime` class (和暦などformatを追加)
+ *  追加した記号
  *  J : 元号
  *  b : 元号略称(ローマ字)
  *  K : 和暦年(1年を元年と表記)
@@ -19,8 +18,6 @@ namespace kcal;
  * 例) $dt = new KsDateTime('1965/10/18 16:10');
  *　   echo $dt->format('JK年n月j日(x) Eg:m'); // 昭和40年10月18日(月) 午後4:10
  */
-
-class KsDateTime extends \DateTime{
 
   const JP_DATE = 'JK年n月j日'; // 例:平成元年5月7日（明治5年以前は当時と異なる日付が出るので注意）
   const JP_TIME = 'Eg時i分s秒'; // 例:午後3時05分07秒
@@ -43,40 +40,25 @@ class KsDateTime extends \DateTime{
 
   /** 日本語曜日設定 */
   private static $weekJp = [
-    0 => '日',
-    1 => '月',
-    2 => '火',
-    3 => '水',
-    4 => '木',
-    5 => '金',
-    6 => '土',
-  ];
-  /** 午前午後 */
-  private static $ampm = [
-    'am' => '午前',
-    'pm' => '午後',
+    0 => '日',  1 => '月', 2 => '火', 3 => '水',  4 => '木', 5 => '金', 6 => '土',
   ];
 
-  /**
-   * 文字列に変換された際に返却するもの
-   *
-   * @return string
-   */
+  /** 午前午後 */
+  private static $ampm = [
+    'am' => '午前',  'pm' => '午後',
+  ];
+
+  /** 文字列に変換された際に返却するもの */
   public function __toString()
   {
     return $this->format(self::DEFAULT_TO_STRING_FORMAT);
   }
   
-  /**
-   * 和暦などを追加したformatメソッド
-   * @param string $format DateTime::formatに準ずるformat文字列
-   * @return string
-   */
+  /** 和暦などを追加したformatメソッド  */
   public function format($format): string
   {
-
     // 和暦関連のオプションがある場合は和暦取得
-   $jp_year = array();
+    $jp_year = array();
     if (preg_match('/(?<!\\\)[J|b|K|k]/', $format)) {
       foreach (self::$jpYearNameList as $gengo) {
         if ($gengo['timestamp'] <= $this->getTimestamp()) {
@@ -85,24 +67,24 @@ class KsDateTime extends \DateTime{
         }
       }
       // 元号が取得できない場合はException
-      if (empty($jpYear)) {
+      if (empty($jp_year)) {
         throw new \Exception('Invalid timestamp : '.$this->getTimestamp());
       }
     }
 
     // J : 元号
     if ($this->hasChar('J', $format)) {
-      $format = $this->replaceChar('J',$jp_year['name'], $format);
+      $format = $this->replaceChar('J', $jp_year['name'], $format);
     }
 
     // b : 元号略称(ローマ字)
     if ($this->hasChar('b', $format)) {
-      $format = preg_replace('/b/',$jp_year['name_short'], $format);
+      $format = preg_replace('/b/', $jp_year['name_short'], $format);
     }
 
     // K : 和暦用年(元年表示)
     if ($this->hasChar('K', $format)) {
-      $year = date('Y', $this->getTimestamp()) - date('Y',$jp_year['timestamp']) + 1;
+      $year = date('Y', $this->getTimestamp()) - date('Y', $jp_year['timestamp']) + 1;
       $year = $year == 1 ? '元' : $year;
       $format = $this->replaceChar('K', $year, $format);
     }

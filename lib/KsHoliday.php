@@ -9,12 +9,8 @@ namespace kcal;
  */
 
 
-
-require "vendor/autoload.php";
-
 use kcal\KsCalendar;
 use kcal\KsDateTime;
-use kcal\Availability;
 
 use Exception;
 use function array_filter;

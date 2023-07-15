@@ -1,24 +1,15 @@
 <?php
 namespace kcal;
 
-require "vendor/autoload.php";
+require "../vendor/autoload.php";
 
 use \Symfony\Component\Yaml\Yaml;
 use \kcal\KsCalendar;
 use \kcal\KsHoliday;
-// use \kcal\Availability;
+use \kcal\Availability;
 
-define ('LIB_DIR', 'lib');
-define ('DAT_DIR', 'dat');
-
-// require LIB_DIR. '/KsCalendar.php';
-// require LIB_DIR. '/KsHoliday.php';
-// require LIB_DIR. '/Availability.php';
-
-// $dat_calendar = include(DAT_DIR. '/php/dat_calendar.php');
-// $dat_reservation = include(DAT_DIR. '/php/dat_reservation.php');   
-// $dat_facility = include(DAT_DIR. '/php/dat_facility.php');
-// $dat_holiday = include(DAT_DIR. '/php/dat_holiday.php');
+define ('LIB_DIR', '../lib');
+define ('DAT_DIR', '../dat');
 
 $input = file_get_contents(DAT_DIR . "/calendar.yaml");
 $dat_calendar = Yaml::parse($input);

@@ -2,15 +2,12 @@
 
 namespace kcal;
 
-require "vendor/autoload.php";
-
 use Exception;
 use function array_unique;
 use function is_scalar;
 use function ceil;
 use function range;
 use function date;
-
 
 class KsCalendar
 {

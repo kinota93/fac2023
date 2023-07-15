@@ -1,12 +1,6 @@
 <?php
 namespace kcal;
 
-require "vendor/autoload.php";
-
-// use kcal\KsDateTime;
-// use kcal\KsCalendar;
-// use kcal\KsHoliday;
-
 use Exception;
 use function array_keys;
 use function array_unique;
@@ -16,9 +10,6 @@ use function explode;
 use function implode;
 use function substr;
 use function array_merge;
-
-// require_once 'KsCalendar.php';
-// require_once 'KsHoliday.php';
 
 class Availability{
     public $calendar;
