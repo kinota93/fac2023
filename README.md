@@ -3,7 +3,7 @@
 
 # Introduction
 
-A pure PHP business calendar library.  It is general-purpose that supports public holidays,  business/non-business days, and availability management. It is rule-based where days specified by rules such as second Monday one or every month, 
+*KsCal* is a pure PHP business calendar library. It is general-purpose that supports public holidays,  business/non-business days, and availability management. It is rule-based where days specified by rules such as second Monday one or every month, 
 
 - Rules for **days**, **weeks** and **weekdays**.  E.g., `week=[2,4], wday=[3]` for *2nd* and *4th* Wednesdays.
 - constraints of appliable rules by `during` and `except`.
