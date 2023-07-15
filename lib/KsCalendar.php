@@ -49,7 +49,7 @@ class KsCalendar
         return $days;
     } 
 
-    /** w2d() : transform weekday to day  */
+    /** w2d() : transform i'th weekday to day  */
     public function w2d($wday, $i = 1)
     {   
         $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
