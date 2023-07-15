@@ -1,27 +1,27 @@
 <?php
-$ksu_timeslots = 	[
+$ksuslots = 	[
     1 => [
-	    'start_time' => '9:00',
-	    'end_time' => '10:40',
+	    'start' => '9:00',
+	    'end' => '10:40',
     ],
 
     2 => [
-        'start_time' => '11:00',
-        'end_time' => '12:40',
+        'start' => '11:00',
+        'end' => '12:40',
     ],
 
     3 => [
-        'start_time' => '13:40',
-        'end_time' => '15:20',
+        'start' => '13:40',
+        'end' => '15:20',
     ],
     4 => [
-        'start_time' => '15:40',
-        'end_time' => '17:20',
+        'start' => '15:40',
+        'end' => '17:20',
     ],
 
     5 => [
-        'start_time' => '17:40',
-        'end_time' => '19:20',
+        'start' => '17:40',
+        'end' => '19:20',
     ],
 ]; // end of timeslots
 
@@ -30,14 +30,14 @@ return  [
         'name' => '12107番教室',
         'building' => '12号館',
         'floor' => 1,
-        'timeslots' => $ksu_timeslots,
+        'timeslots' => $ksuslots,
 	],
 
 	'12216'=>[ 
         'name' => '12216番教室',
         'building' => '12号館',
         'floor' => 2,
-        'timeslots' =>  $ksu_timeslots,  
+        'timeslots' =>  $ksuslots,  
     ],
 
     '12311'=>[

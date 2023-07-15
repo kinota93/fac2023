@@ -1,8 +1,37 @@
 <?php
+
 namespace kcal;
 
-require_once 'KsuCalendar.php';
-class Holiday
+/*
+ * Created on Sat Jul 15 2023
+ *
+ * Copyright (c) 2023 Your Company
+ */
+
+
+
+require "vendor/autoload.php";
+
+use kcal\KsCalendar;
+use kcal\KsDateTime;
+use kcal\Availability;
+
+use Exception;
+use function array_filter;
+use function array_diff;
+use function in_array;
+use function is_array;
+use function sprintf;
+use function preg_match;
+use function explode;
+use function substr;
+use function trim;
+use function mktime;
+use function floor;
+
+// require_once 'KsCalendar.php';
+
+class KsHoliday
 {
     public $year;
     public $holidays;
@@ -97,7 +126,7 @@ class Holiday
     */
     function parseDay($month, $day)
     {
-        $cal = new \kcal\KsuCalendar($this->year, $month);
+        $cal = new KsCalendar($this->year, $month);
         if (is_integer($day))
             return $day;
         if (is_array($day))
@@ -164,7 +193,7 @@ class Holiday
                     $hday = $this->parseDay($_month, $d['day']);
                     
                     if ($hday > 0){
-                        $date = (new \DateTime)->setDate($this->year, $_month, $hday);
+                        $date = (new KsDateTime)->setDate($this->year, $_month, $hday);
                         
                         // supplementary holiday for coincident holidays
                         if ($ex_holiday != null ){ // for a pending ex_holiday 
@@ -176,10 +205,10 @@ class Holiday
                             }
                         }
                         $holidays[$date->format('m-d')] = $d['name'];
-                        $cal = new KsuCalendar($this->year, $_month);   
+                        $cal = new KsCalendar($this->year, $_month);   
                         $wday = $cal->d2w($hday);
                         if ($wday === 0) { // prepare a new ex_hodilday
-                            $ex_holiday = (new \DateTime)->setDate($this->year, $_month, $hday +1);
+                            $ex_holiday = (new KsDateTime)->setDate($this->year, $_month, $hday +1);
                         }
                         
                     }    

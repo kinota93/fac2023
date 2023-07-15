@@ -1,8 +1,24 @@
 <?php
 namespace kcal;
 
-require_once 'KsuCalendar.php';
-require_once 'Holiday.php';
+require "vendor/autoload.php";
+
+// use kcal\KsDateTime;
+// use kcal\KsCalendar;
+// use kcal\KsHoliday;
+
+use Exception;
+use function array_keys;
+use function array_unique;
+use function in_array;
+use function sprintf;
+use function explode;
+use function implode;
+use function substr;
+use function array_merge;
+
+// require_once 'KsCalendar.php';
+// require_once 'KsHoliday.php';
 
 class Availability{
     public $calendar;
@@ -53,7 +69,7 @@ class Availability{
         if (isset($fac['timeslots'])) {
             $rs['timeslots'] = sprintf("[%s]\n", implode(',',array_keys($fac['timeslots'])));
             foreach ($fac['timeslots'] as $id=>$v){
-                $rs['timeslots'] .= sprintf(" %d: %s - %s\n", $id, $v['start_time'], $v['end_time']);
+                $rs['timeslots'] .= sprintf(" %d: %s - %s\n", $id, $v['start'], $v['end']);
             }
         }
         if (isset($fac['timeunit'])) {
