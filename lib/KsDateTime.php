@@ -3,160 +3,121 @@
 namespace kcal;
 
 class KsDateTime extends \DateTime{
-/* Japanese extensions to standard `DateTime` class (和暦などformatを追加)
- *  追加した記号
- *  J : 元号
- *  b : 元号略称(ローマ字)
- *  K : 和暦年(1年を元年と表記)
- *  k : 和暦年
- *  x : 日本語曜日(0:日-6:土)
- *  E : 午前午後
- *  X : 同じ週の初日（日曜日の日）。1から31
- *  Q : 西暦年度(n: n年4月1日～n+1年3月31日)。数字。例：2020,
- *  q : 和暦年度(n: 年号n年4月1日～年号n+1年3月31日)。数字。例：2
- * 
- * 例) $dt = new KsDateTime('1965/10/18 16:10');
- *　   echo $dt->format('JK年n月j日(x) Eg:m'); // 昭和40年10月18日(月) 午後4:10
- */
 
-  const JP_DATE = 'JK年n月j日'; // 例:平成元年5月7日（明治5年以前は当時と異なる日付が出るので注意）
-  const JP_TIME = 'Eg時i分s秒'; // 例:午後3時05分07秒
+    /* Format characters   
+     * Used in DateTime class : 
+          [AB.D.FGHI..LMNOP..STU.WXYZ a.cde.ghij.lmnop.rstuvwxyz]
+          not yet used [CEJKQRV.bfkq]
+     * Used in KsDateTime class: 
+     *    [EJKQR.bkq], not yet used [CV.f]
+     */ 
+    private const HELP = <<<'EOT'
+Japanese extensions to standard `DateTime` class (和暦などformatを追加)
+追加した記号:
+J : 元号(漢字)。例：昭和
+R : 元号略称(ローマ字)。例：S
+K : 和暦年(1年を元年と表記)。例：元、2、3
+k : 和暦年(数字のみ)。例：1、2、3
+Q : 西暦年度(数字。4月～新年度)。例：2019
+q : 和暦年度(数字。4月～新年度)。例：2
+b : 日本語曜日(漢字一文字)。例：火、木、土
+E : 午前午後
+例) $dt = new KsDateTime("1965/10/18 16:10");
+    echo $dt->format("JK年n月j日(x) Eg:m"); // 昭和40年10月18日(月) 午後4:10
+EOT; // single-quoted dochere string
 
-  const DEFAULT_TO_STRING_FORMAT = 'Y-m-d H:i:s'; // toString()で利用する表示フォーマット
+    const DEFAULT_TO_STRING_FORMAT = 'Y-m-d H:i:s'; // toString()で利用する表示フォーマット
+    const DATETIME_FORMAT = '/(?<!\\\)[ABDFGHILMNOPSTUWXYZacdeghijlmnoprstuvwxyz]/';
+    const KSDATETIME_FORMAT = '/(?<!\\\)[EJKQRkbq]/';
+    private static $gengoNameList = [
+        ['name' => '令和', 'romaji' => 'R', 'since' => '2019-05-01'],  
+        ['name' => '平成', 'romaji' => 'H', 'since' => '1989-01-08'],  
+        ['name' => '昭和', 'romaji' => 'S', 'since' => '1926-12-25'],  
+        ['name' => '大正', 'romaji' => 'T', 'since' => '1912-07-30'],  
+        ['name' => '明治', 'romaji' => 'M', 'since' => '1868-01-25'],  
+    ];    
 
-  /**
-   * 元号用設定
-   * timestamp  1970-01-01からの秒数
-   *  $date = new DateTime('1989-01-08'); // 平成開始
-   *  echo $date->getTimeStamp();  // 600188400
-   */
-  private static$jpYearNameList = [
-    ['name' => '令和', 'name_short' => 'R', 'timestamp' =>  1556636400], // 2019-05-01
-    ['name' => '平成', 'name_short' => 'H', 'timestamp' =>  600188400 ], // 1989-01-08
-    ['name' => '昭和', 'name_short' => 'S', 'timestamp' => -1357635600], // 1926-12-25
-    ['name' => '大正', 'name_short' => 'T', 'timestamp' => -1812186000], // 1912-07-30
-    ['name' => '明治', 'name_short' => 'M', 'timestamp' => -3216790800], // 1868-01-25
-  ];
+   // 日本語曜日設定 
+    private static $weekJp = [
+        0=>'日', 1=>'月', 2=>'火', 3=>'水', 4=>'木', 5=>'金', 6=>'土' 
+    ];
 
-  /** 日本語曜日設定 */
-  private static $weekJp = [
-    0 => '日',  1 => '月', 2 => '火', 3 => '水',  4 => '木', 5 => '金', 6 => '土',
-  ];
+    // 午前午後 
+    private static $ampm = ['am'=>'午前',  'pm'=>'午後' ];
 
-  /** 午前午後 */
-  private static $ampm = [
-    'am' => '午前',  'pm' => '午後',
-  ];
-
-  /** 文字列に変換された際に返却するもの */
-  public function __toString()
-  {
-    return $this->format(self::DEFAULT_TO_STRING_FORMAT);
-  }
-  
-  /** 和暦などを追加したformatメソッド  */
-  public function format($format): string
-  {
-    // 和暦関連のオプションがある場合は和暦取得
-    $jp_year = array();
-    if (preg_match('/(?<!\\\)[J|b|K|k]/', $format)) {
-      foreach (self::$jpYearNameList as $gengo) {
-        if ($gengo['timestamp'] <= $this->getTimestamp()) {
-           $jp_year = $gengo;
-            break;
+    /** 文字列に変換された際に返却するもの */
+    public function __toString()
+    {
+        return $this->format(self::DEFAULT_TO_STRING_FORMAT);
+    }
+    
+    public static function help()
+    {
+        return self::HELP;
+    }
+    /** 和暦などを追加したformatメソッド  */
+    public function format($format): string
+    {
+        $format = parent::format($format); // IMPORTANT!! First do it! 
+        if (! preg_match(self::KSDATETIME_FORMAT, $format)){
+            return $format;
         }
-      }
-      // 元号が取得できない場合はException
-      if (empty($jp_year)) {
-        throw new \Exception('Invalid timestamp : '.$this->getTimestamp());
-      }
-    }
 
-    // J : 元号
-    if ($this->hasChar('J', $format)) {
-      $format = $this->replaceChar('J', $jp_year['name'], $format);
-    }
+        $gengo = array();
+        $now = $this->getTimestamp();
+        foreach (self::$gengoNameList as $g) {
+            $since = new \DateTime($g['since']);
+            if ($since->getTimestamp() <= $now) {
+                $gengo = $g;
+                break;
+            }
+        }
 
-    // b : 元号略称(ローマ字)
-    if ($this->hasChar('b', $format)) {
-      $format = preg_replace('/b/', $jp_year['name_short'], $format);
-    }
+        if (empty($gengo)) {
+            throw new \Exception('No available Gengo for timestamp '. $now);
+        }
 
-    // K : 和暦用年(元年表示)
-    if ($this->hasChar('K', $format)) {
-      $year = date('Y', $this->getTimestamp()) - date('Y', $jp_year['timestamp']) + 1;
-      $year = $year == 1 ? '元' : $year;
-      $format = $this->replaceChar('K', $year, $format);
-    }
+        $since = new \DateTime($gengo['since']);
+        
+        $m = date('n', $now);
+        $w = date('w', $now);
+        $a = date('a', $now);
 
-    // k : 和暦用年(数字)
-    if ($this->hasChar('k', $format)) {
-      $year = date('Y', $this->getTimestamp()) - date('Y',$jp_year['timestamp']) + 1;
-      $format = $this->replaceChar('k', $year, $format);
-    }
-
-    // x : 日本語曜日
-    if ($this->hasChar('x', $format)) {
-      $w = date('w', $this->getTimestamp());
-      $format = $this->replaceChar('x', self::$weekJp[$w], $format);
-    }
-
-    // 午前午後
-    if ($this->hasChar('E', $format)) {
-      $a = date('a', $this->getTimestamp());
-      $value = isset(self::$ampm[$a]) ? self::$ampm[$a] : '';
-      $format = $this->replaceChar('E', $value, $format);
-    }
-
-    // X : 週の初日（日曜日の日）。1から31
-    if ($this->hasChar('X', $format)) {
-      $w = date('w', $this->getTimestamp());
-      $value = date('j', $this->getTimestamp() - $w * 24 * 60 * 60);
-      $format = $this->replaceChar('X', $value, $format);
-    }
+        $year0 = date('Y', $now);//西暦年
+        $year1 = $year0 - $since->format('Y') + 1;//和暦年
+        $year2 =  $m < 4 ? $year0 - 1 : $year0;//西暦年度
+        $year3 =  $m < 4 ? $year1 - 1 : $year1;//和暦年度
+        $am_pm = isset(self::$ampm[$a]) ? self::$ampm[$a] : '';
     
-    // Q : 西暦年度(n: n年4月1日～n+1年3月31日)。数字。例：2020,
-    if ($this->hasChar('Q', $format)) {
-      $month = date('n', $this->getTimestamp());
-      $year  = date('Y', $this->getTimestamp());
-      $value = (3 < $month and $month < 13  ) ? $year : $year - 1; 
-      $format = $this->replaceChar('Q', $value, $format);
+        $format_chars = [
+            'J' => $gengo['name'],  // 元号(漢字)
+            'R' => $gengo['romaji'], // 元号略称(ローマ字)
+            'K' => $year1==1 ? '元' : $year1, // 和暦用年(元年表示)
+            'k' => $year1, // 和暦用年(数字のみ)
+            'Q' => $year2, // 西暦年度(数字)。例：2020
+            'q' => $year3, // 和暦年度(数字)。例：2
+            'b' => self::$weekJp[$w], // 日本語曜日
+            'E' => $am_pm, // 午前午後
+            ];
+        foreach ($format_chars as $symbol=>$value){
+            if ($this->hasChar($symbol, $format)){
+                $format = $this->replaceChar($symbol, $value, $format);
+            }  
+        }
+        return $format;
     }
-    
-    // q : 和暦年度(n: 年号n年4月1日～年号n+1年3月31日)。数字。例：2
-    if ($this->hasChar('q', $format)) {
-      $month = date('n', $this->getTimestamp());
-      $year  = date('Y', $this->getTimestamp()) - date('Y',$jp_year['timestamp']) + 1;
-      $value = (3 < $month and $month < 13  ) ? $year : $year - 1; 
-      $format = $this->replaceChar('q', $value, $format);
+
+    /** 指定した文字があるかどうか調べる（エスケープされているものは除外） */
+    private function hasChar($char, $string)
+    {
+        return preg_match('/(?<!\\\)' . $char . '/', $string);
     }
-    return parent::format($format);
-  }
 
-  /**
-   * 指定した文字があるかどうか調べる（エスケープされているものは除外）
-   * @param string $char 検索する文字
-   * @param string $string 検索される文字列
-   * @return boolean
-   */
-  private function hasChar($char, $string)
-  {
-    return preg_match('/(?<!\\\)'.$char.'/', $string);
-  }
-
-  /**
-   * 指定した文字を置換する(エスケープされていないもののみ)
-   * @param string $char 置換される文字
-   * @param string $replace 置換する文字列
-   * @param string $string 元の文字列
-   * @return string 置換した文字列
-   */
-  private function replaceChar($char, $replace, $string)
-  {
-    // エスケープされていないもののみ置換
-    $string = preg_replace('/(?<!\\\)'.$char.'/', '${1}'.$replace, $string);
-    // エスケープ文字を削除
-    $string = preg_replace('/\\\\'.$char.'/', $char, $string);
-    return $string;
-  }
+    /** 指定した文字を置換する(エスケープされていないもののみ) */
+    private function replaceChar($char, $replace, $string)
+    {
+        $string = preg_replace('/(?<!\\\)' . $char . '/', '${1}'. $replace, $string);
+        $string = preg_replace('/\\\\' . $char . '/', $char, $string); // エスケープ文字を削除
+        return $string;
+    } 
 }

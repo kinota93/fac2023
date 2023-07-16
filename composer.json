@@ -1,9 +1,22 @@
 {
   "name": "availability/facility",
-  "description":"Rule driven caculation of calendar days and availability",
+  "description":"A Pure PHP business calendar library ",
   "version": "1.0.0",
-  "type": "project",
-  "time":"2023-6-6",
+  "type": "library",
+  "keywords": [
+    "holiday",
+    "holidays",
+    "calendar",
+    "national",
+    "calculation",
+    "celebration",
+    "date",
+    "time",
+    "business",
+    "facility",
+    "availability"
+  ],
+  "readme": "README.md",
   "authors": [
     {
       "name": "hoge",
@@ -14,6 +27,11 @@
   "autoload": {
     "psr-4": {
         "kcal\\": "lib/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "kcal\\tests\\": "tests/"
     }
   },
   "require": {

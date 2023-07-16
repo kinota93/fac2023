@@ -2,10 +2,13 @@
 require "../vendor/autoload.php";
 use \Symfony\Component\Yaml\Yaml;
 
-define ('DAT_DIR', '../dat');
+const DAT_DIR = '../dat';
 
 header('Content-Type: text/plain; charset=UTF-8');
 
+echo "*** UNIT TESTS (Symfony/Yaml)***\n";
+
+echo "\n\n";
 echo "=======dat/holiday.yaml============\n";
 $input = file_get_contents(DAT_DIR . "/holiday.yaml");
 $result = Yaml::parse($input);

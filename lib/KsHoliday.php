@@ -8,7 +8,6 @@ namespace kcal;
  * Copyright (c) 2023 Your Company
  */
 
-
 use kcal\KsCalendar;
 use kcal\KsDateTime;
 
@@ -25,12 +24,23 @@ use function trim;
 use function mktime;
 use function floor;
 
-// require_once 'KsCalendar.php';
-
 class KsHoliday
 {
     public $year;
     public $holidays;
+
+    private const LAW_ENFORCEMENT_YEAR = 1948;
+    private const SUPPLEMENTARY_HOLIDAY = '振替休日';
+    private const ADDITIONAL_HOLIDAY = '国民の休日';
+    
+    // Valid keys in holiday definition
+    private const NAME = 'name'; // holiday name
+    private const DAY = 'day';   // day definition
+    private const FOR = 'for';  // valid for a period
+    private const IN = 'in';    // valid in some years
+    private const EXCEPT = 'except'; // valid except some years
+
+    private const DATE_FORMAT ='m-d'; // '01-07' for January 7 
     
     public function __construct($year, $dat_holiday)
     {
@@ -44,14 +54,14 @@ class KsHoliday
         if ($month == 0) return $this->holidays;
         
         return array_filter($this->holidays, function ($x) use($month) {
-                return (int)substr($x, 0, 2) === $month;
+                return (int)substr($x, 0, 2) === (int)$month;
             }, ARRAY_FILTER_USE_KEY);
     }
    
 
     /** query by name, support pattern matching  */
     public function queryByname($name){
-        return array_filter($this->holidays,function($v) use($name){
+        return array_filter($this->holidays, function($v) use($name){
             return preg_match("/{$name}/", $v);
         });
     }
@@ -59,7 +69,7 @@ class KsHoliday
     /** query by date, guess date format */
     public function queryBydate($date){
         $date = self::guessDate($date);
-        return array_filter($this->holidays,function($v) use($date){
+        return array_filter($this->holidays, function($v) use($date){
             return $v === trim($date);
         }, ARRAY_FILTER_USE_KEY);                
     }
@@ -90,7 +100,7 @@ class KsHoliday
     {
         list ($m, $d) = explode('-', $date);
         $time = mktime(0, 0, 0, $m, $d + $days, $this->year);
-        return date('m-d',$time);
+        return date(self::DATE_FORMAT, $time);
     }
 
     /** check if all elements of array $a are defined keys of array $b, 
@@ -169,24 +179,26 @@ class KsHoliday
      * @param string $sp_name, additional holiday for a noraml day sandwiched by 2 holidays
      * @return array a list of holidays,  [mm-dd] => name
      */
-    private function _parseHolidays($dat_holiday, $ex_name='振替休日', $sp_name='国民の休日')
+    private function _parseHolidays($dat_holiday)
     {
         $holidays = [];
+        if ($this->year < self::LAW_ENFORCEMENT_YEAR)
+            return $holidays;
         $ex_holiday = null;
         foreach ($dat_holiday as $_month=>$_days){
             foreach ($_days as $d){
                 $valid = true;
-                if (isset($d['during'])){
-                    $valid = $valid && $this->during($this->year, $d['during']);
+                if (isset($d[self::FOR])){
+                    $valid = $valid && $this->during($this->year, $d[self::FOR]);
                 }
-                if (isset($d['except'])){
-                    $valid = $valid && !in_array($this->year, $d['except']);
+                if (isset($d[self::EXCEPT])){
+                    $valid = $valid && !in_array($this->year, $d[self::EXCEPT]);
                 }
-                if (isset($d['in'])){
-                    $valid = $valid && in_array($this->year, $d['in']);
+                if (isset($d[self::IN])){
+                    $valid = $valid && in_array($this->year, $d[self::IN]);
                 }
                 if ($valid) {
-                    $hday = $this->parseDay($_month, $d['day']);
+                    $hday = $this->parseDay($_month, $d[self::DAY]);
                     
                     if ($hday > 0){
                         $date = (new KsDateTime)->setDate($this->year, $_month, $hday);
@@ -196,11 +208,11 @@ class KsHoliday
                             if ($ex_holiday === $date){
                                 $ex_holiday->modify('+1 day');
                             }else{
-                                $holidays[$ex_holiday->format('m-d')] = $ex_name;
+                                $holidays[$ex_holiday->format(self::DATE_FORMAT)] = self::SUPPLEMENTARY_HOLIDAY;
                                 $ex_holiday = null;
                             }
                         }
-                        $holidays[$date->format('m-d')] = $d['name'];
+                        $holidays[$date->format(self::DATE_FORMAT)] = $d[self::NAME];
                         $cal = new KsCalendar($this->year, $_month);   
                         $wday = $cal->d2w($hday);
                         if ($wday === 0) { // prepare a new ex_hodilday
@@ -219,7 +231,7 @@ class KsHoliday
         foreach ($holidays as $date=>$name){
             if ($prev_date and $this->sandwiched($prev_date, $date)){
                 $middle = $this->mkdate($prev_date, +1);
-                $ex_holidays[$middle] = $sp_name;
+                $ex_holidays[$middle] = self::ADDITIONAL_HOLIDAY;
             }
             $prev_date = $date;
         }

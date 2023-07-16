@@ -24,7 +24,7 @@ $input = file_get_contents(DAT_DIR . "/calendar.yaml");
 $dat_calendar = Yaml::parse($input);
 
 $input = file_get_contents(DAT_DIR . "/facility.yaml");
-$dat_facility = Yaml::parse($input)['facility'];
+$dat_facility = Yaml::parse($input);
 
 $input = file_get_contents(DAT_DIR . "/holiday.yaml");
 $dat_holiday = Yaml::parse($input);
@@ -37,7 +37,6 @@ $year  = isset($_GET['y']) ? $_GET['y'] : 2023;
 $month = isset($_GET['m']) ? $_GET['m'] :8;
 $facility = isset($_GET['f'])  ? $_GET['f'] : 12216;
 
-
 $hday = new KsHoliday($year, $dat_holiday );
 $kcal = new KsCalendar($year, $month);
 $avil = new Availability($kcal, $hday, $facility);
@@ -45,7 +44,7 @@ $avil = new Availability($kcal, $hday, $facility);
 $fac = $avil->parseFacility($dat_facility);
 
 echo "facility: ", $facility, "\n";
-if ($fac){    
+if ($fac){
     if (isset($fac['time'])){
         echo "time: " , $fac['time'], "\n";
     }
@@ -58,6 +57,8 @@ if ($fac){
 echo "\n";
 
 printf("%d年%d月\n=========\n", $kcal->year, $kcal->month);
+
+echo $kcal, "\n\n";
 
 $dates = $avil->getAvailability($dat_calendar, $dat_reservation);
 $avil->output($dates);

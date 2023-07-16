@@ -1,4 +1,8 @@
+<?php
+header('Content-Type: text/plain; charset=UTF-8');
+?>
 facility: 12216
+time: 9:00 - 18:30
 timeslots: [1,2,3,4,5]
  1: 9:00 - 10:40
  2: 11:00 - 12:40
@@ -6,9 +10,15 @@ timeslots: [1,2,3,4,5]
  4: 15:40 - 17:20
  5: 17:40 - 19:20
 
-
 2023年8月
-========
+=========
+Sun Mon Tue Wed Thu Fri Sat
+         1   2   3   4   5  
+ 6   7   8   9  10  11  12  
+13  14  15  16  17  18  19  
+20  21  22  23  24  25  26  
+27  28  29  30  31
+
 01(火):
 02(水):
 03(木):
@@ -21,14 +31,14 @@ timeslots: [1,2,3,4,5]
  - type: local_holiday
  * name: OB講演会
  - type: event
- - time: 1,2,3 (slots)
+ - time: 1,2 (slots)
 09(水):
  * name: 定休日
  - type: local_holiday
 10(木):
 11(金):
  * name: 山の日
- - type: public_holiday
+ - type: national_holiday
 12(土):
 13(日):
 14(月):

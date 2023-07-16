@@ -1,9 +1,19 @@
+<?php
+header('Content-Type: text/plain; charset=UTF-8');
+?>
 facility: 12311
 time: 9:00 - 21:00
 timeslots: every 10 minute(s)
 
 2023年9月
-========
+=========
+Sun Mon Tue Wed Thu Fri Sat
+                     1   2  
+ 3   4   5   6   7   8   9  
+10  11  12  13  14  15  16  
+17  18  19  20  21  22  23  
+24  25  26  27  28  29  30
+
 01(金):
 02(土):
 03(日):
@@ -30,14 +40,14 @@ timeslots: every 10 minute(s)
 17(日):
 18(月):
  * name: 敬老の日
- - type: public_holiday
+ - type: national_holiday
 19(火):
 20(水):
 21(木):
 22(金):
 23(土):
  * name: 秋分の日
- - type: public_holiday
+ - type: national_holiday
 24(日):
 25(月):
 26(火):
