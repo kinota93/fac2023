@@ -21,8 +21,8 @@ Note that a *local holiday* will ALWAYS be a non-business day, no matter how it 
  For a given  **month**, the specification of rules for holidays is given by 
 
 - `name` :  holiday name, business day's name, or a reservation name.  
-- `day` : definition of a day, which can be a fixed day e.g., `12` or a fixed weekday, `[3, 1]`, the 3rd Monday. 
-- `for`, `in`, `except` : define when the rule is valid. E.g., `for [2013, 2023], except [2017, 2019, 2021]` , or `in [2020, 2021]`.
+- `day` : definition of a day, which can be a fixed day e.g., `12` or a fixed weekday, `[3, 1]`, that is the 3rd Monday. 
+- `for`, `in`, `except` : define when the rule is valid. E.g., `for [2016, 2022] except [2017, 2021]` , is the same as`in [2016, 2018, 2019, 2020, 2022]`.
 
 ## Business Calendar
 For a given a **year**,  the specification of rules for business calendar is given by  
