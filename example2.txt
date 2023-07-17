@@ -1,6 +1,3 @@
-<?php
-header('Content-Type: text/plain; charset=UTF-8');
-?>
 facility: 12311
 time: 9:00 - 21:00
 timeslots: every 10 minute(s)

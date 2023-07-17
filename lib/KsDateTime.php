@@ -64,34 +64,34 @@ EOT; // single-quoted dochere string
         if (! preg_match(self::KSDATETIME_FORMAT, $format)){
             return parent::format($format);
         }
-
+        
         $now = $this->getTimestamp();
         $gengo = $this->getGengo($now);
+        
         if (empty($gengo)) {
             throw new \Exception('No available Gengo for timestamp '. $now);
         }
 
         $since = new \DateTime($gengo['since']);        
-        $m = date('n', $now);
-        $w = date('w', $now);
-        $a = date('a', $now);
-
+        $month = date('n', $now);
         $year0 = date('Y', $now); //西暦年
         $year1 = $year0 - $since->format('Y') + 1; //和暦年
-        $year2 =  $m < 4 ? $year0 - 1 : $year0; //西暦年度
-        $year3 =  $m < 4 ? $year1 - 1 : $year1; //和暦年度
+        $year2 =  $month < 4 ? $year0 - 1 : $year0; //西暦年度
+        $year3 =  $month < 4 ? $year1 - 1 : $year1; //和暦年度
+        $a = date('a', $now);
         $am_pm = isset(self::$ampm[$a]) ? self::$ampm[$a] : '';
-    
+        $w = date('w', $now);    
+        
         $format_chars = [
             'J' => $gengo['name'],  // 元号(漢字)
-            'R' => '\\' . $gengo['romaji'], // 元号略称(ローマ字),※元号ローマ字をエスケープ
+            'R' => '\\' . $gengo['romaji'], // 元号略称(フォーマット文字とされないようにエスケープ必要)
             'K' => $year1==1 ? '元' : $year1, // 和暦用年(元年表示)
-            'k' => $year1, // 和暦用年(数字のみ)
-            'Q' => $year2, // 西暦年度(数字)。例：2020
-            'q' => $year3, // 和暦年度(数字)。例：2
+            'k' => $year1, // 和暦用年
+            'Q' => $year2, // 西暦年度
+            'q' => $year3, // 和暦年度
             'b' => self::$weekJp[$w], // 日本語曜日
             'E' => $am_pm, // 午前午後
-            ];
+        ];
         foreach ($format_chars as $symbol=>$value){
             if ($this->hasChar($symbol, $format)){
                 $format = $this->replaceChar($symbol, $value, $format);
@@ -102,7 +102,7 @@ EOT; // single-quoted dochere string
 
     /** 指定した文字があるかどうか調べる（エスケープされているものは除外） */
     private function hasChar($char, $string)
-    {  // 否定後読み(?<!パターン) ..「\」以外で始まる対象文字にマッチ
+    {  // 否定後読み「(?<!パターン)」。「\」以外で始まる対象文字にマッチ
         return preg_match('/(?<!\\\)' . $char . '/', $string); 
     }
 

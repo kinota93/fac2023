@@ -18,8 +18,8 @@ class KsCalendar
     public $firstwday;// @var weekday of the first day 
     public $lastwday;// @var weekday of the last day
     
-    public const PREFER_TO_WDAY = 1;    
-    public const PREFER_TO_WEEK = 2;    
+    public const PREFER_TO_WDAY = 1;  // selects the n'th weekday   
+    public const PREFER_TO_WEEK = 2;  // selects a weekday in n'th week 
 
     public function __construct($year, $month)
     {
@@ -32,17 +32,8 @@ class KsCalendar
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
-    /** select() : selects dates of the specified weekdays  
-     * When PREFER_TO_WDAY (default), selects n'th weekday 
-     *   ex) select([1,3],[2,4]): 1st and 3rd Tuesday and Thursday
-     *   ex) select(2, [1,3]) : 2nd Monday and Wednesday
-     *   ex) select(3, 4) :  3rd Thursday
-     * When PREFER_TO_WEEK ($prefer==2), selects a weekday in n'th week
-     *   ex) select([1,3],[2,4], PREFER_TO_WEEK): Tuesday and Thursday in 1st and 3rd weeks 
-     *   ex) select(2, [1,3], PREFER_TO_WEEK) : Monday and Wednesday in 2nd week
-     *   ex) select(3, 4, PREFER_TO_WEEK): Thursday in 3rd week
-    */
-    public function select($week, $wday=[], $prefer = 1)
+    /** select() : selects days with specific weekdays */
+    public function select($week, $wday=[], $prefer=1)
     {    
         $days = [];
         if (is_scalar($week)) $week = [$week];
@@ -61,11 +52,11 @@ class KsCalendar
         return $days;
     } 
 
-    /** w2d() : transform the i'th weekday to a day number */
-    public function w2d($wday, $i = 1)
+    /** w2d() : transform the n'th weekday to a day number */
+    public function w2d($wday, $n = 1)
     {   
-        $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
-        return $i * 7 + $wday - $this->firstwday + 1;
+        $n = ($wday >= $this->firstwday) ?  $n - 1 : $n;
+        return $n * 7 + $wday - $this->firstwday + 1;
     }
 
     /** d2w(): transform a day number to weekday */
@@ -74,7 +65,7 @@ class KsCalendar
         return ($this->firstwday + $day -1) % 7;
     }
 
-    /** is_valid(): check if it is in the valid range */
+    /** is_valid(): check the validality of a day */
     public function is_valid($d, $flag='DAY')
     {
         if ($flag==='DAY')
@@ -97,6 +88,6 @@ class KsCalendar
                 $out .= "\n";
             }
         }
-        return trim($out); // trim trailing \n chracters
+        return trim($out); 
     }
 }

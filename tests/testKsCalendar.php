@@ -18,7 +18,7 @@ echo "*** UNIT TESTS (KsCalendar) ***\n\n";
 echo "year = ", $year, ", month = ", $month, "\n\n";
 echo $kcal, "\n\n";
 
-$week = [1,2,5];
+$week = [1,5];
 $wday = [0,6];
 
 printf("(*) KsCalendar::select([%s], [%s])\n",implode(',',$week),implode(',',$wday),);
