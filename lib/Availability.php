@@ -30,6 +30,7 @@ class Availability{
     public function parseCalendar($dat_calendar)
     {
         $month = $this->calendar->month;
+        $dates = [];
         foreach ($dat_calendar as $day){
             if (isset($day['days'])){ // 日付で与えられた臨時休日・臨時営業日
                 foreach ($day['days'] as $md => $name){
