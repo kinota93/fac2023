@@ -31,27 +31,21 @@ For a given a **year**,  the specification of rules for business calendar is giv
 
 
 # Classes
-## KsHoliday Class
-
-Paragraph paragraph paragraph paragraph
-
- 
-
 ## KsCalendar Class
 
 Paragraph paragraph paragraph paragraph
 
- 
+## KsHoliday Class
+
+KsHoliday class Paragraph paragraph paragraph paragraph 
 
 ## Availability Class
 
-Paragraph paragraph paragraph paragraph
+Paragraph paragraph paragraph paragraph 
 
- 
+## KsDateTime Class
 
-# KsDateTime Class
-
-The following characters are recognized in the format parameter string
+KsDateTime class is an extension of  *DateTime* class by introducing new format characters for Japanese calendar. The following characters are recognized in the format parameter string.
 
 | format character | Description | Example returned values |
 | ---------------- | ----------- | ----------------------- |
