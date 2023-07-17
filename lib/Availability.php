@@ -16,8 +16,8 @@ class Availability{
     public $holiday;
     public $facility;
 
-    private const BUSINESS_DAY='営業日';
-    private const NON_BUSINESS_DAY='定休日';    
+    private const BUSINESS_DAY = '営業日';
+    private const NON_BUSINESS_DAY = '定休日';    
 
     public function __construct($calendar, $holiday ,$facility)
     {
@@ -31,23 +31,21 @@ class Availability{
     {
         $month = $this->calendar->month;
         foreach ($dat_calendar as $day){
-            if (isset($day['days'])){// 日付で与えられた臨時休日・臨時営業日
+            if (isset($day['days'])){ // 日付で与えられた臨時休日・臨時営業日
                 foreach ($day['days'] as $md => $name){
                     list($m, $d) = explode('-', $md);
                     if ($m == $month) {
                         $dates[(int)$d][] = ['type'=>$day['type'], 'name'=>$name];
                     }
                 }
-            }else{ // 曜日で与えられた定休日・営業日
-                if (!isset($day['month']) or 
-                    (isset($day['month']) and in_array($month, $day['month']))){
-                    $name = substr($day['type'],-7)=='holiday' ? self::NON_BUSINESS_DAY : self::BUSINESS_DAY;
-                    $week = array_unique($day['week']);
-                    $wday = array_unique($day['wday']);                
-                    $days = $this->calendar->select($week, $wday);   
-                    foreach ($days as $d){
-                        $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
-                    }
+            }elseif (!isset($day['month']) or // 曜日で与えられた定休日・営業日
+                (isset($day['month']) and in_array($month, $day['month']))){
+                $name = substr($day['type'],-7)=='holiday' ? self::NON_BUSINESS_DAY : self::BUSINESS_DAY;
+                $week = array_unique($day['week']);
+                $wday = array_unique($day['wday']);                
+                $days = $this->calendar->select($week, $wday);   
+                foreach ($days as $d){
+                    $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
                 }
             }
         }
@@ -57,12 +55,12 @@ class Availability{
     public function parseFacility($dat_facility)
     {
         $the_facility = $dat_facility['facility'];
-        $rs = [];
         if (!isset($the_facility[$this->facility])) {
-            return $rs;
+            return [];
         }
         
         $fac = $the_facility[$this->facility];
+        $rs = [];
         if (isset($fac['timeslots'])) {
             $rs['timeslots'] = sprintf("[%s]\n", implode(',',array_keys($fac['timeslots'])));
             foreach ($fac['timeslots'] as $id=>$v){
@@ -77,18 +75,17 @@ class Availability{
         }
         if (isset($fac['time'])){ // local business time
             $rs['time'] = $fac['time']['open'] . ' - ' . $fac['time']['close'] ;
-        }elseif (isset($dat_facility['business'])){ // global business  time
+        }elseif (isset($dat_facility['business'])){ // global business time
             $rs['time'] = $dat_facility['business']['open'] . ' - ' . $dat_facility['business']['close'] ;
         }
-        
         return $rs;
     }
 
     public function parseReservation($reservation)
     {
-        $dates = [];
         $year = $this->calendar->year;
         $month = $this->calendar->month;
+        $dates = [];
         foreach ($reservation as $rev){
             if ($rev['facility_id'] != $this->facility) continue;
             list($y, $m, $d) = explode('-', $rev['date']);
@@ -104,33 +101,28 @@ class Availability{
     
     public function getAvailability($calendar, $reservation)
     {
-        $dates = [];
         $year = $this->calendar->year;
         $month = $this->calendar->month;
 
-        // National holidays
+        $dates = []; // national holidays
         $holidays = $this->holiday->getHolidays($month);
         foreach($holidays as $md => $name){
             list($_, $d) = explode('-', $md);
             $dates[(int)$d][] = ['type'=>'national_holiday', 'name'=>$name];
         }
-
         // Business days and non-business days
         if (isset($calendar[$year])){
             $cal_dates = $this->parseCalendar($calendar[$year]);    
             foreach ($cal_dates as $d=>$v){
                 $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
             }
-        } 
-        
+        }        
         // Reservations
         $rev_dates = $this->parseReservation($reservation);
         foreach ($rev_dates as $d=>$v){
             $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
         }
-
         ksort($dates); 
-
         return $dates;
     }
 
@@ -139,21 +131,21 @@ class Availability{
         $days = range(1, $this->calendar->lastday);
         $wdays = array_map([$this->calendar,'d2w'], $days);
         $names =["日", "月", "火", "水", "木", "金", "土"];
-        for ($i= 0; $i< $this->calendar->lastday; $i++){
+        for ($i = 0; $i < $this->calendar->lastday; $i++){
             $d = $days[$i];
             $w = $wdays[$i];
-            printf( "%02d(%s):\n",$d, $names[$w]);
+            printf( "%02d(%s):\n", $d, $names[$w]);
             if (! isset($dates[$d])) continue;
             foreach ($dates[$d] as $r){
                 echo " * name: " . $r['name'] . "\n";
                 echo " - type: " . $r['type'] . "\n";
                 if (isset($r['timeslot'])){
-                    $timeslots = implode(',',$r['timeslot']) ; 
-                    echo " - time: ". $timeslots . " (slots)\n";
+                    $timeslots = implode(',' , $r['timeslot']) ; 
+                    echo " - time: " . $timeslots . " (slots)\n";
                 }
                 if (isset($r['timespan'])){
-                    $timespan = implode(' - ',$r['timespan']) ; 
-                    echo " - time: ". $timespan . "\n";
+                    $timespan = implode(' - ' , $r['timespan']) ; 
+                    echo " - time: " . $timespan . "\n";
                 }
             }
         }

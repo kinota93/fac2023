@@ -61,14 +61,14 @@ class KsCalendar
         return $days;
     } 
 
-    /** w2d() : transform i'th weekday to a day  */
+    /** w2d() : transform the i'th weekday to a day number */
     public function w2d($wday, $i = 1)
     {   
         $i = ($wday >= $this->firstwday) ?  $i - 1 : $i;
         return $i * 7 + $wday - $this->firstwday + 1;
     }
 
-    /** d2w(): transform a day to its weekday */
+    /** d2w(): transform a day number to weekday */
     public function d2w($day)
     {
         return ($this->firstwday + $day -1) % 7;
@@ -89,7 +89,7 @@ class KsCalendar
     {
         $out = "Sun Mon Tue Wed Thu Fri Sat\n";
         for ($i = 0; $i < $this->firstwday; $i++){
-            $out .= "    ";
+            $out .= "    "; // 4 spaces
         }
         for ($i = 0; $i < $this->lastday; $i++){
             $out .= sprintf("% 2d  ", $i + 1);
@@ -97,6 +97,6 @@ class KsCalendar
                 $out .= "\n";
             }
         }
-        return trim($out); // trim all trailing \n chracters
+        return trim($out); // trim trailing \n chracters
     }
 }

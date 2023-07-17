@@ -5,18 +5,13 @@
 
 *KsCal* is a pure PHP business calendar library. It provides a general framework for definition and calculation of national holidays, business calendar (business days / non-business days) and facility availability. The calculation is rule-based.  
 
-## Notations
-
-- **holiday**, `national` and `local`   
-- **business day**, or **workday**
-- **business weekday** 
-- **non-business weekday** , 
-- **availability**,   `available`, or `reserved`  
-
+There are four types of dates:  (1) **holiday**, either`national` or `local`   (2) **business day**, or **workday**
+(3) **business weekday**, (4) **non-business weekday**, (5) **availability**,  either `available` or `reserved`.   
 
 Note that a *local holiday* will ALWAYS be a non-business day, no matter how it was defined elsewhere. A *local workday* will ALWAYS be a business day, no matter how it was defined elsewhere.  A *national holiday* will be a non-business day unless it is explicitly defined as a local workday. 
 
-## Holiday
+# Rule Specification
+## Rule Specification for Holiday
 
  For a given  **month**, the specification of rules for holidays is given by 
 
@@ -24,31 +19,31 @@ Note that a *local holiday* will ALWAYS be a non-business day, no matter how it 
 - `day` : definition of a day, which can be a fixed day e.g., `12` or a fixed weekday, `[3, 1]`, that is the 3rd Monday. 
 - `for`, `in`, `except` : define when the rule is valid. E.g., `for [2016, 2022] except [2017, 2021]` , is the same as`in [2016, 2018, 2019, 2020, 2022]`.
 
-## Business Calendar
+## Rule Specification for Business Calendar
 For a given a **year**,  the specification of rules for business calendar is given by  
 
 -  `type`, type of the calendar days, such as  *local_holiday*, *local_workday*
 -  `days`, a list of individual days, each is given by a pair of a date in format of`mm-dd` and a name. E.g., `'10-12' : 'temporary workday'`  
 - `week`, `wday`, routine business days or non-business days defined by  specifying weekdays in  some weeks  E.g., `(week=[2,4], wday=[3])`  means the *2nd* and *4th* Wednesdays.
-- `month`, optionally defines a list of months for which the rule is valid. 
+- `month`, a list of months for which the rule is valid. 
 
 -  **reservation**, reserved timespans or timeslots for a specific facility
 
 
-
-# KsHoliday Class
-
-Paragraph paragraph paragraph paragraph
-
- 
-
-# KsCalendar Class
+# Classes
+## KsHoliday Class
 
 Paragraph paragraph paragraph paragraph
 
  
 
-# Availability Class
+## KsCalendar Class
+
+Paragraph paragraph paragraph paragraph
+
+ 
+
+## Availability Class
 
 Paragraph paragraph paragraph paragraph
 

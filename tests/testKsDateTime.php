@@ -24,20 +24,20 @@ echo "output : ", $dt;
 echo "\n\n";
 $format = 'Y年n月j日(b)';
 echo "format : '{$format}'\n";
-echo "output : ", $dt->format($format); // 昭和40年10月18日(月) 午後4:10
+echo "output : ", $dt->format($format); // 昭和40年3月18日(木)
 
 echo "\n\n";
-$format = 'JK年n月j日(b) Eg:m';
+$format = 'JK年n月j日(b) Eg:i';
 echo "format : '{$format}' \n";
-echo "output : ", $dt->format($format); // 昭和40年10月18日(月) 午後4:10
+echo "output : ", $dt->format($format); // 昭和40年3月18日(木) 午後4:10
 
 echo "\n\n";
-$format = 'Q年度n月j日(b) Eg:m';
+$format = 'Q年度n月j日(b) Eg:i';
 echo "format : '{$format}' \n";
 echo "output : ", $dt->format($format); 
 
 echo "\n\n";
-$format = 'Jq年度n月j日(b) Eg:m';
+$format = 'Jq年度n月j日(b) Eg:i';
 echo "format : '{$format}' \n";
 echo "output : ", $dt->format($format); 
 
@@ -46,6 +46,10 @@ $format = 'Rk.m.d';
 echo "format : '{$format}' \n";
 echo "output : ", $dt->format($format); 
 
+echo "\n\n";
+$format = 'Y年n月j日(b)\j\K';
+echo "format : '{$format}'\n";
+echo "output : ", $dt->format($format); // 昭和40年3月18日(月)jK 
 
 
 

@@ -5,11 +5,8 @@ namespace kcal;
 class KsDateTime extends \DateTime{
 
     /* Format characters   
-     * Used in DateTime class : 
-          [AB.D.FGHI..LMNOP..STU.WXYZ a.cde.ghij.lmnop.rstuvwxyz]
-          not yet used [CEJKQRV.bfkq]
-     * Used in KsDateTime class: 
-     *    [EJKQR.bkq], not yet used [CV.f]
+     * DateTime  : [AB.D.FGHI..LMNOP..STU.WXYZ a.cde.ghij.lmnop.rstuvwxyz]
+     * KsDateTime: [EJKQR.bkq], not used [CV.f]
      */ 
     private const HELP = <<<'EOT'
 Japanese extensions to standard `DateTime` class (和暦などformatを追加)
@@ -22,13 +19,18 @@ Q : 西暦年度(数字。4月～新年度)。例：2019
 q : 和暦年度(数字。4月～新年度)。例：2
 b : 日本語曜日(漢字一文字)。例：火、木、土
 E : 午前午後
+
+使用中のフォーマット文字:( )内はKsDateTimeに追加されるもの「.」未使用
+  AB.D(E)FGHI(JK)LMNOP(QR)STU.WXYZa(b)cde.ghij(k)lmnop(q)rstuvwxyz
+
 例) $dt = new KsDateTime("1965/10/18 16:10");
-    echo $dt->format("JK年n月j日(x) Eg:m"); // 昭和40年10月18日(月) 午後4:10
+    echo $dt->format("JK年n月j日(x) Eg:i"); // 昭和40年10月18日(月) 午後4:10
 EOT; // single-quoted dochere string
 
     const DEFAULT_TO_STRING_FORMAT = 'Y-m-d H:i:s'; // toString()で利用する表示フォーマット
     const DATETIME_FORMAT = '/(?<!\\\)[ABDFGHILMNOPSTUWXYZacdeghijlmnoprstuvwxyz]/';
     const KSDATETIME_FORMAT = '/(?<!\\\)[EJKQRkbq]/';
+
     private static $gengoNameList = [
         ['name' => '令和', 'romaji' => 'R', 'since' => '2019-05-01'],  
         ['name' => '平成', 'romaji' => 'H', 'since' => '1989-01-08'],  
@@ -55,43 +57,34 @@ EOT; // single-quoted dochere string
     {
         return self::HELP;
     }
+
     /** 和暦などを追加したformatメソッド  */
     public function format($format): string
     {
-        $format = parent::format($format); // IMPORTANT!! First do it! 
         if (! preg_match(self::KSDATETIME_FORMAT, $format)){
-            return $format;
+            return parent::format($format);
         }
 
-        $gengo = array();
         $now = $this->getTimestamp();
-        foreach (self::$gengoNameList as $g) {
-            $since = new \DateTime($g['since']);
-            if ($since->getTimestamp() <= $now) {
-                $gengo = $g;
-                break;
-            }
-        }
-
+        $gengo = $this->getGengo($now);
         if (empty($gengo)) {
             throw new \Exception('No available Gengo for timestamp '. $now);
         }
 
-        $since = new \DateTime($gengo['since']);
-        
+        $since = new \DateTime($gengo['since']);        
         $m = date('n', $now);
         $w = date('w', $now);
         $a = date('a', $now);
 
-        $year0 = date('Y', $now);//西暦年
-        $year1 = $year0 - $since->format('Y') + 1;//和暦年
-        $year2 =  $m < 4 ? $year0 - 1 : $year0;//西暦年度
-        $year3 =  $m < 4 ? $year1 - 1 : $year1;//和暦年度
+        $year0 = date('Y', $now); //西暦年
+        $year1 = $year0 - $since->format('Y') + 1; //和暦年
+        $year2 =  $m < 4 ? $year0 - 1 : $year0; //西暦年度
+        $year3 =  $m < 4 ? $year1 - 1 : $year1; //和暦年度
         $am_pm = isset(self::$ampm[$a]) ? self::$ampm[$a] : '';
     
         $format_chars = [
             'J' => $gengo['name'],  // 元号(漢字)
-            'R' => $gengo['romaji'], // 元号略称(ローマ字)
+            'R' => '\\' . $gengo['romaji'], // 元号略称(ローマ字),※元号ローマ字をエスケープ
             'K' => $year1==1 ? '元' : $year1, // 和暦用年(元年表示)
             'k' => $year1, // 和暦用年(数字のみ)
             'Q' => $year2, // 西暦年度(数字)。例：2020
@@ -104,13 +97,13 @@ EOT; // single-quoted dochere string
                 $format = $this->replaceChar($symbol, $value, $format);
             }  
         }
-        return $format;
+        return parent::format($format);
     }
 
     /** 指定した文字があるかどうか調べる（エスケープされているものは除外） */
     private function hasChar($char, $string)
-    {
-        return preg_match('/(?<!\\\)' . $char . '/', $string);
+    {  // 否定後読み(?<!パターン) ..「\」以外で始まる対象文字にマッチ
+        return preg_match('/(?<!\\\)' . $char . '/', $string); 
     }
 
     /** 指定した文字を置換する(エスケープされていないもののみ) */
@@ -119,5 +112,19 @@ EOT; // single-quoted dochere string
         $string = preg_replace('/(?<!\\\)' . $char . '/', '${1}'. $replace, $string);
         $string = preg_replace('/\\\\' . $char . '/', $char, $string); // エスケープ文字を削除
         return $string;
-    } 
+    }
+
+    /** Lookup the gengo definition */
+    private function getGengo($now)
+    {
+        $gengo = array();
+        foreach (self::$gengoNameList as $g) {
+            $since = new \DateTime($g['since']);
+            if ($since->getTimestamp() <= $now) {
+                $gengo = $g;
+                break;
+            }
+        }
+        return $gengo;
+    }
 }

@@ -182,9 +182,10 @@ class KsHoliday
     private function _parseHolidays($dat_holiday)
     {
         $holidays = [];
-        if ($this->year < self::LAW_ENFORCEMENT_YEAR)
+        if ($this->year < self::LAW_ENFORCEMENT_YEAR){
             return $holidays;
-        $ex_holiday = null;
+        }
+        $sp_holiday = null; // supplementary holiday for coincident holidays
         foreach ($dat_holiday as $_month=>$_days){
             foreach ($_days as $d){
                 $valid = true;
@@ -198,35 +199,30 @@ class KsHoliday
                     $valid = $valid && in_array($this->year, $d[self::IN]);
                 }
                 if ($valid) {
-                    $hday = $this->parseDay($_month, $d[self::DAY]);
-                    
+                    $hday = $this->parseDay($_month, $d[self::DAY]);                    
                     if ($hday > 0){
                         $date = (new KsDateTime)->setDate($this->year, $_month, $hday);
-                        
-                        // supplementary holiday for coincident holidays
-                        if ($ex_holiday != null ){ // for a pending ex_holiday 
-                            if ($ex_holiday === $date){
-                                $ex_holiday->modify('+1 day');
+                        if ($sp_holiday != null ){ // for a pending ex_holiday 
+                            if ($sp_holiday === $date){
+                                $sp_holiday->modify('+1 day');
                             }else{
-                                $holidays[$ex_holiday->format(self::DATE_FORMAT)] = self::SUPPLEMENTARY_HOLIDAY;
-                                $ex_holiday = null;
+                                $holidays[$sp_holiday->format(self::DATE_FORMAT)] = self::SUPPLEMENTARY_HOLIDAY;
+                                $sp_holiday = null;
                             }
                         }
                         $holidays[$date->format(self::DATE_FORMAT)] = $d[self::NAME];
                         $cal = new KsCalendar($this->year, $_month);   
                         $wday = $cal->d2w($hday);
                         if ($wday === 0) { // prepare a new ex_hodilday
-                            $ex_holiday = (new KsDateTime)->setDate($this->year, $_month, $hday +1);
-                        }
-                        
+                            $sp_holiday = (new KsDateTime)->setDate($this->year, $_month, $hday +1);
+                        }                        
                     }    
                 }
             }
         }
         ksort($holidays);
         
-        // additional holiday, a normal day (rarely) sandwiched by two holidays
-        $ex_holidays =[];
+        $ex_holidays =[]; // additional holiday, a normal day sandwiched by two holidays
         $prev_date = null;
         foreach ($holidays as $date=>$name){
             if ($prev_date and $this->sandwiched($prev_date, $date)){
@@ -236,8 +232,7 @@ class KsHoliday
             $prev_date = $date;
         }
         $holidays = array_merge($holidays, $ex_holidays);
-        ksort($holidays);
-      
+        ksort($holidays);      
         return $holidays;
     }
 }
