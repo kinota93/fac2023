@@ -83,6 +83,7 @@ class KsHoliday
         if (preg_match('/[0-9]{4}/', $date)){
             return substr($date, 0, 2) .'-'.substr($date, 2, 2);
         }
+        return $date;
     }
 
     /** check if there is exact one day between 2 dates, 
