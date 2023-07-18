@@ -59,6 +59,7 @@ EOT; // single-quoted dochere string
         return self::HELP;
     }
 
+    /** compute time interval in minute between datetime strings */
     public static function delta($time1, $time2)
     {
         $dtime1 = new \DateTimeImmutable($time1);
