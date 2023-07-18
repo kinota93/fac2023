@@ -59,22 +59,35 @@ class Availability{
         
         $fac = $the_facility[$this->facility];
         $rs = [];
+
+        $bz_time = [];
+        $time_unit =  '1 hour';
+        if (isset($fac['time'])){ // local business time
+            $bz_time = $fac['time'];
+        }elseif (isset($dat_facility['business'])){ // global business time
+            $bz_time = $dat_facility['business'];
+        }
+        if ($bz_time){
+            $rs['time'] = $bz_time['open'] . ' - ' . $bz_time['close'] ;
+        }
+
         if (isset($fac['timeslots'])) {
             $rs['timeslots'] = sprintf("[%s]\n", implode(',' , array_keys($fac['timeslots'])));
             foreach ($fac['timeslots'] as $id=>$v){
                 $rs['timeslots'] .= sprintf(" %d: %s - %s\n", $id, $v['start'], $v['end']);
             }
             $rs['timeslots'] = trim($rs['timeslots']);
+            $rs['capacity'] = count($fac['timeslots']);
         }
+
         if (isset($fac['timeunit'])) {
             $rs['timeslots'] = sprintf("every %d %s(s)", 
                 $fac['timeunit']['length'], $fac['timeunit']['unit']);
+            $time_unit = $fac['timeunit']['length'] .' ' . $fac['timeunit']['unit'];
         }
-        if (isset($fac['time'])){ // local business time
-            $rs['time'] = $fac['time']['open'] . ' - ' . $fac['time']['close'] ;
-        }elseif (isset($dat_facility['business'])){ // global business time
-            $rs['time'] = $dat_facility['business']['open'] . ' - ' . $dat_facility['business']['close'] ;
-        }
+        if (!isset($rs['capacity']))
+            $rs['capacity'] = $this->calendar->interval($bz_time, $time_unit);
+     
         return $rs;
     }
 
