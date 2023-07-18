@@ -3,7 +3,12 @@
 
 # Introduction
 
-*KsCal* is a pure PHP business calendar library. It provides a general framework for definition and calculation of national holidays, business calendar (business days / non-business days) and facility availability. The calculation is rule-based.  
+*KsCal* is a pure PHP business calendar library. It provides a general framework for definition and calculation of national holidays, business calendar (business days / non-business days) and facility availability. The calculation is rule-based.  It provides 4 classes:
+
+- **KsDateTime**, extended `DateTime` class,  support new format characters for japanese weekday, gengo, fiscal year.
+- **KsCalendar**, model of business calendar. parse configuration from `YAML` file and provide easy ways to access weeks and days in a month.
+- **KsHoliday**, model of national holidays. parse configuration from `YAML` file and support eacy ways for holiday query, query *by date*, *by month*, or *by holiday name* (supports partial matching).
+- **Availability**, model of availability information. Aggregate information related to national holidays, business calendar, and reservation, calculate availability of time for any day of a month.
 
 ## Terms and Notations
 
