@@ -18,7 +18,7 @@ echo "\n";
 echo "===================================================================\n";
 
 echo "\n\n";
-echo "format: default, call `__toString()`\n";
+echo "format: 'Y-m-d H:i:s': default, __toString()\n";
 echo "output : ", $dt;
 
 echo "\n\n";

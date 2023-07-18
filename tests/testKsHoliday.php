@@ -25,7 +25,7 @@ echo "(*) KsHoliday::getHolidays():\n";
 echo "==========================\n";
 $holidays = $hday->getHolidays(); // one year
 print_r($holidays);
-echo "Total ", count($holidays), "days\n";
+echo "Total ", count($holidays), " days\n";
 
 echo "\n";
 echo "(*) KsHoliday::getHolidays({$month}):\n";

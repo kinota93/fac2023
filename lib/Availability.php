@@ -3,7 +3,6 @@ namespace kcal;
 
 use Exception;
 use function array_keys;
-use function array_unique;
 use function in_array;
 use function sprintf;
 use function explode;
