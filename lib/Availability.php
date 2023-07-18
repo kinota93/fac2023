@@ -32,8 +32,8 @@ class Availability{
         $month = $this->calendar->month;
         $dates = [];
         foreach ($dat_calendar as $day){
-            if (isset($day['days'])){ // 日付で与えられた臨時休日・臨時営業日
-                foreach ($day['days'] as $md => $name){
+            if (isset($day['day'])){ // 日付で与えられた臨時休日・臨時営業日
+                foreach ($day['day'] as $md => $name){
                     list($m, $d) = explode('-', $md);
                     if ($m == $month) {
                         $dates[(int)$d][] = ['type'=>$day['type'], 'name'=>$name];
@@ -41,10 +41,8 @@ class Availability{
                 }
             }elseif (!isset($day['month']) or // 曜日で与えられた定休日・営業日
                 (isset($day['month']) and in_array($month, $day['month']))){
-                $name = substr($day['type'],-7)=='holiday' ? self::NON_BUSINESS_DAY : self::BUSINESS_DAY;
-                $week = array_unique($day['week']);
-                $wday = array_unique($day['wday']);                
-                $days = $this->calendar->select($week, $wday);   
+                $name = substr($day['type'],-7)=='holiday' ? self::NON_BUSINESS_DAY : self::BUSINESS_DAY;             
+                $days = $this->calendar->select($day['week'], $day['wday']);   
                 foreach ($days as $d){
                     $dates[$d][] = ['type'=>$day['type'], 'name'=>$name];
                 }
@@ -63,7 +61,7 @@ class Availability{
         $fac = $the_facility[$this->facility];
         $rs = [];
         if (isset($fac['timeslots'])) {
-            $rs['timeslots'] = sprintf("[%s]\n", implode(',',array_keys($fac['timeslots'])));
+            $rs['timeslots'] = sprintf("[%s]\n", implode(',' , array_keys($fac['timeslots'])));
             foreach ($fac['timeslots'] as $id=>$v){
                 $rs['timeslots'] .= sprintf(" %d: %s - %s\n", $id, $v['start'], $v['end']);
             }
@@ -71,8 +69,7 @@ class Availability{
         }
         if (isset($fac['timeunit'])) {
             $rs['timeslots'] = sprintf("every %d %s(s)", 
-                $fac['timeunit']['length'], 
-                $fac['timeunit']['unit']);
+                $fac['timeunit']['length'], $fac['timeunit']['unit']);
         }
         if (isset($fac['time'])){ // local business time
             $rs['time'] = $fac['time']['open'] . ' - ' . $fac['time']['close'] ;
@@ -86,6 +83,7 @@ class Availability{
     {
         $year = $this->calendar->year;
         $month = $this->calendar->month;
+
         $dates = [];
         foreach ($reservation as $rev){
             if ($rev['facility_id'] != $this->facility) continue;
@@ -93,7 +91,7 @@ class Availability{
             if ($y==$year and $m==$month){
                 $rs = ['type'=>'event', 'name'=>$rev['event']];
                 if (isset($rev['timeslot'])) $rs['timeslot'] = $rev['timeslot'];
-                if (isset($rev['timespan'])) $rs['timespan'] = $rev['timespan'];
+                if (isset($rev['timeslice'])) $rs['timeslice'] = $rev['timeslice'];
                 $dates[(int)$d][] =  $rs;
             }
         }
@@ -105,20 +103,20 @@ class Availability{
         $year = $this->calendar->year;
         $month = $this->calendar->month;
 
-        $dates = []; // national holidays
+        $dates = []; 
         $holidays = $this->holiday->getHolidays($month);
-        foreach($holidays as $md => $name){
+        foreach($holidays as $md => $name){ // national holidays
             list($_, $d) = explode('-', $md);
             $dates[(int)$d][] = ['type'=>'national_holiday', 'name'=>$name];
         }
-        // Business days and non-business days
-        if (isset($calendar[$year])){
+        
+        if (isset($calendar[$year])){ // business calendar
             $cal_dates = $this->parseCalendar($calendar[$year]);    
             foreach ($cal_dates as $d=>$v){
                 $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
             }
         }        
-        // Reservations
+
         $rev_dates = $this->parseReservation($reservation);
         foreach ($rev_dates as $d=>$v){
             $dates[$d] = isset($dates[$d]) ? array_merge($dates[$d], $v) : $v;      
@@ -129,24 +127,18 @@ class Availability{
 
     function output($dates)
     {
-        $days = range(1, $this->calendar->lastday);
-        $wdays = array_map([$this->calendar,'d2w'], $days);
-        $names =["日", "月", "火", "水", "木", "金", "土"];
-        for ($i = 0; $i < $this->calendar->lastday; $i++){
-            $d = $days[$i];
-            $w = $wdays[$i];
-            printf( "%02d(%s):\n", $d, $names[$w]);
-            if (! isset($dates[$d])) continue;
+        foreach (range(1, $this->calendar->lastday) as $d){
+            printf( "%02d(%s):\n", $d, $this->calendar->d2w($d, 'JP'));
+            if (!isset($dates[$d])) continue;    
+            
             foreach ($dates[$d] as $r){
                 echo " * name: " . $r['name'] . "\n";
                 echo " - type: " . $r['type'] . "\n";
                 if (isset($r['timeslot'])){
-                    $timeslots = implode(',' , $r['timeslot']) ; 
-                    echo " - time: " . $timeslots . " (slots)\n";
+                    echo " - time: " . implode(',' , $r['timeslot']) . " (slots)\n";
                 }
-                if (isset($r['timespan'])){
-                    $timespan = implode(' - ' , $r['timespan']) ; 
-                    echo " - time: " . $timespan . "\n";
+                if (isset($r['timeslice'])){
+                    echo " - time: " . implode(' - ' , $r['timeslice']) . "\n";
                 }
             }
         }

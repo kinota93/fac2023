@@ -13,6 +13,6 @@
 
 - date: '2023-9-12'
   facility_id: 12311
-  timespan: ['10:40','12:30']
+  timeslice: [10:40,12:30]
   event: 運用室会議
  

@@ -18,8 +18,10 @@ class KsCalendar
     public $firstwday;// @var weekday of the first day 
     public $lastwday;// @var weekday of the last day
     
-    public const PREFER_TO_WDAY = 1;  // selects the n'th weekday   
-    public const PREFER_TO_WEEK = 2;  // selects a weekday in n'th week 
+    public const PREFER_TO_WDAY = 1;  // find the n'th weekday    
+    public const PREFER_TO_WEEK = 2;  // in n'th week find the weekday  
+    private const JP_WEEKDAY = ["日", "月", "火", "水", "木", "金", "土"];
+    private const EN_WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     public function __construct($year, $month)
     {
@@ -40,12 +42,12 @@ class KsCalendar
         if (is_scalar($week)) $wday = [$wday];
         $wday =  empty($wday) ? range(0, 6) : array_unique($wday);
         foreach ($wday as $wd){
-            foreach ($week as $wk ){
+            foreach ($week as $n ){
                 if ($prefer == self::PREFER_TO_WEEK){
-                    $wk = ($wd < $this->firstwday) ? $wk - 1 : $wk;
+                    $n = ($wd < $this->firstwday) ? $n - 1 : $n;
                 }
-                if ($wk < 1)  continue;
-                $day = $this->w2d($wd, $wk);
+                if ($n < 1)  continue;
+                $day = $this->w2d($wd, $n);
                 if ( $this->is_valid($day) ) $days[] = $day;
             }
         };
@@ -60,9 +62,14 @@ class KsCalendar
     }
 
     /** d2w(): transform a day number to weekday */
-    public function d2w($day)
+    public function d2w($day, $name='')
     {
-        return ($this->firstwday + $day -1) % 7;
+        $w = ($this->firstwday + $day -1) % 7;
+        if ($name === 'JP')
+            return self::JP_WEEKDAY[$w];
+        if ($name === 'EN')
+            return self::EN_WEEKDAY[$w];
+        return $w;
     }
 
     /** is_valid(): check the validality of a day */

@@ -29,17 +29,9 @@ class KsHoliday
     public $year;
     public $holidays;
 
-    private const LAW_ENFORCEMENT_YEAR = 1948;
-    private const SUPPLEMENTARY_HOLIDAY = '振替休日';
-    private const ADDITIONAL_HOLIDAY = '国民の休日';
-    
-    // Valid keys in holiday definition
-    private const NAME = 'name'; // holiday name
-    private const DAY = 'day';   // day definition
-    private const FOR = 'for';  // valid for a period
-    private const IN = 'in';    // valid in some years
-    private const EXCEPT = 'except'; // valid except some years
-
+    private const HOLIDAY_START_YEAR = 1948;
+    private const SUPPLEMENT_HOLIDAY = '振替休日';
+    private const ADDITIONAL_HOLIDAY = '国民の休日';   
     private const DATE_FORMAT ='m-d'; // '01-07' for January 7 
     
     public function __construct($year, $dat_holiday)
@@ -100,28 +92,28 @@ class KsHoliday
         return date(self::DATE_FORMAT, $time);
     }
 
-    /** check if all elements of array $a are defined keys of array $b, 
+    /** check if all elements of $keys are defined in $array 
      * e.g. is_defined(['tom','bob'], ['bob'=>23, 'abe'=>35, 'tom'=>56]) => TRUE
     */
-    function is_defined($a, $b)
+    function is_defined($keys, $array)
     {
-        $diff = array_diff($a, array_keys($b));
+        $diff = array_diff($keys, array_keys($array)); 
         return empty($diff); 
     }
 
-    /** check if $a is in range defeined by array $b, 
+    /** check if $a is in range of $range[0] ~ $range[1] 
      * e.g. during(3, [2,4]) => TRUE  
     */
-    function during($a, $b)
+    function during($a, $range)
     {
-        if (is_scalar($b))
-            return $a === $b;
-        if (sizeof($b) >= 2)
-            return ($b[0] <= $a and $a <= $b[1]);
+        if (is_scalar($range))
+            return $a === $range;
+        if (sizeof($range) >= 2)
+            return ($range[0] <= $a and $a <= $range[1]);
         return false;
     }
 
-    /** parse the day definition: (1) a day, (2) a weekday, (3) others   
+    /** parse the day definition and get a definite day 
     */
     function parseDay($month, $day)
     {
@@ -142,7 +134,6 @@ class KsHoliday
     */
     function equinox($season='spring'){
         $year = $this->year;
-
         if (!$this->during($year, [1851, 2150])){
             return -1;
         }
@@ -163,46 +154,47 @@ class KsHoliday
     private function validateYear($day)
     {
         $valid = true;
-        if (isset($day[self::FOR])){
-            $valid = $valid && $this->during($this->year, $day[self::FOR]);
+        if (isset($day['for'])){
+            $valid = $valid && $this->during($this->year, $day['for']);
         }
-        if (isset($day[self::EXCEPT])){
-            $valid = $valid && !in_array($this->year, $day[self::EXCEPT]);
+        if (isset($day['except'])){
+            $valid = $valid && !in_array($this->year, $day['except']);
         }
-        if (isset($day[self::IN])){
-            $valid = $valid && in_array($this->year, $day[self::IN]);
+        if (isset($day['in'])){
+            $valid = $valid && in_array($this->year, $day['in']);
         }
         return $valid;
     }
 
-    /** parse holiday definictions and geerate holidays*/
+    /** parse holiday definitions and return an array of holidays for this year */
     private function parseHolidays($dat_holiday)
     {
-        $holidays = [];
-        if ($this->year < self::LAW_ENFORCEMENT_YEAR){
-            return $holidays;
+        if ($this->year < self::HOLIDAY_START_YEAR){
+            return [];
         }
-        $sp_holiday = null; // supplementary holiday for coincident holidays
+
+        $holidays = [];
+        $sp_holiday = null; // a holiday supplemnts coincident holidays
         foreach ($dat_holiday as $_month=>$_days){
             foreach ($_days as $d){
                 if (! $this->validateYear($d)){
                     continue;
                 } 
-                $hday = $this->parseDay($_month, $d[self::DAY]);                    
+                $hday = $this->parseDay($_month, $d['day']);                    
                 if ($hday > 0){
                     $date = (new KsDateTime)->setDate($this->year, $_month, $hday);
-                    if ($sp_holiday != null ){ // for a pending ex_holiday 
+                    if ($sp_holiday != null ){ // for a pending sp_holiday 
                         if ($sp_holiday === $date){
                             $sp_holiday->modify('+1 day');
                         }else{
-                            $holidays[$sp_holiday->format(self::DATE_FORMAT)] = self::SUPPLEMENTARY_HOLIDAY;
+                            $holidays[$sp_holiday->format(self::DATE_FORMAT)] = self::SUPPLEMENT_HOLIDAY;
                             $sp_holiday = null;
                         }
                     }
-                    $holidays[$date->format(self::DATE_FORMAT)] = $d[self::NAME];
+                    $holidays[$date->format(self::DATE_FORMAT)] = $d['name'];
                     $cal = new KsCalendar($this->year, $_month);   
                     $wday = $cal->d2w($hday);
-                    if ($wday === 0) { // prepare a new ex_hodilday
+                    if ($wday === 0) { // prepare a new sp_hodilday
                         $sp_holiday = (new KsDateTime)->setDate($this->year, $_month, $hday +1);
                     }                        
                 }    
@@ -210,7 +202,7 @@ class KsHoliday
         }
         ksort($holidays);
         
-        $ex_holidays =[]; // additional holiday, a normal day sandwiched by two holidays
+        $ex_holidays =[]; // an extra holiday sandwiched by two holidays
         $prev_date = null;
         foreach ($holidays as $date=>$name){
             if ($prev_date and $this->sandwiched($prev_date, $date)){

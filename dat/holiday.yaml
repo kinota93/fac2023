@@ -1,9 +1,9 @@
 # month -> list of holiday definitions
 # definition of the `day`:  
 #   (1) int -- a day number
-#   (2) array[int] -- a specified weekday
+#   (2) array[int] -- a [0]'th [1] weekday(0..6)
 # contraints : 
-#   (1) `for`, array[int] -- valid for a period of year
+#   (1) `for`, array[int] -- valid for a period from [0] to [1] inclusive
 #   (2) `in`,  array[int] -- valid in these years
 #   (3) `except`, array[int] -- valid except these years
 1: 

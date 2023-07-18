@@ -20,8 +20,9 @@ q : 和暦年度(数字。4月～新年度)。例：2
 b : 日本語曜日(漢字一文字)。例：火、木、土
 E : 午前午後
 
-使用中のフォーマット文字:( )内はKsDateTimeに追加されるもの「.」未使用
+使用中のフォーマット文字：
   AB.D(E)FGHI(JK)LMNOP(QR)STU.WXYZa(b)cde.ghij(k)lmnop(q)rstuvwxyz
+  ( )内はKsDateTimeに追加されるもの。「.」未使用。
 
 例) $dt = new KsDateTime("1965/10/18 16:10");
     echo $dt->format("JK年n月j日(x) Eg:i"); // 昭和40年10月18日(月) 午後4:10
