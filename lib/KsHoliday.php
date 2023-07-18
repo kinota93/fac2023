@@ -81,9 +81,9 @@ class KsHoliday
     {
         if (preg_match('/^[0-9]+-[0-9]+$/', $date)){
             list ($m, $d) = explode('-', $date);
-        }elseif (preg_match('/^[0-9]{4}$/', $date)){
+        }elseif (preg_match('/^[0-9]{4,}$/', $date)){
             $m = substr($date, 0, 2);
-            $d = substr($date, 2, 2);
+            $d = substr($date, 2);
         }
         if (!isset($m, $d)) {
             throw new Exception('Invalid date format!');

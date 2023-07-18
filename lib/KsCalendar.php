@@ -81,6 +81,10 @@ class KsCalendar
             return (1 <= $d and $d <= $this->n_weeks);
         if ($flag==='WDAY')
             return (0 <= $d and $d <= 6);
+        if ($flag==='MONTH')
+            return (1 <= $d and $d <= 12);
+        
+        return false;
     }
 
     public function __toString()
