@@ -8,7 +8,8 @@
 ## Terms and Notations
 
 1. *holiday*, `national holiday` or `local holiday`
-1. *business day*, or *workday*, open
+1. *business day*, *workday*, open day
+1. *non-business day*, *local holiday*, closed day 
 1. *business weekday*, open weekday
 1. *non-business weekday*, closed weekday
 1. *availability*, status of time, `available` or `reserved`
