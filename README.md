@@ -7,13 +7,14 @@
 
 ## Terms and Notations
 
-1. *holiday* : `national holiday` or `local holiday`
-2. *business day*, or *workday*, *open day*
-3. *business weekday*, *open weekday*
-4. *non-business weekday*, *close weekday*
-5. *timeslice*, *timeslots*, available time / reserved time
-6. *reservation*, reserved time
-7. *availability*, status of time, `available` or `reserved`
+1. *holiday*, `national holiday` or `local holiday`
+1. *business day*, or *workday*, open
+1. *business weekday*, open weekday
+1. *non-business weekday*, closed weekday
+1. *availability*, status of time, `available` or `reserved`
+1. *timeslice*, freely definable time
+1. *timeslot*, predefined time units
+1. *reservation*, reserved time
 
 Note that a *local holiday* will ALWAYS be a non-business day, no matter how it was defined elsewhere. A *local workday* will ALWAYS be a business day, no matter how it was defined elsewhere.  A *national holiday* will be a non-business day unless it is explicitly defined as a local workday. 
 
