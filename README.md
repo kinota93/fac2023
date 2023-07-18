@@ -7,9 +7,9 @@
 
 ## Terms and Notations
 
-1. *holiday*, `national holiday` or `local holiday`
+1. *holiday*, including `national holiday` or `local holiday`
 1. *business day*, *workday*, open day
-1. *non-business day*, *local holiday*, closed day 
+1. *non-business day*, *local holiday*, closed day
 1. *business weekday*, open weekday
 1. *non-business weekday*, closed weekday
 1. *availability*, status of time, `available` or `reserved`
@@ -25,16 +25,16 @@
 
 - `name`: holiday name, business day's name, or a reservation name.  
 - `day`: definition of a day, which can be a fixed day e.g., `12` or a fixed weekday, `[3, 1]`, that is the 3rd Monday.
-- `for`, `in`, `except`: define when the rule is valid. E.g., `for [2016, 2022] except [2017, 2021]` , is the same as`in [2016, 2018, 2019, 2020, 2022]`.
+- `for`, `in`, `except`: define when the rule is valid. E.g., `for [2016, 2022] except [2017, 2021]` , or `in [2016, 2018, 2019, 2020, 2022]` (the same).
 
 ## Rule Specification for Business Calendar
 
-For a given a **year**,  the specification of rules for business calendar is given by  
+For a given *year*,  the specification of rules for business calendar is given by  
 
-- `type`, type of the calendar days, such as  *local_holiday*, *local_workday*
-- `day`, a list of individual days. The day is a pair of  `<date, name>`. E.g., `<'10-12':'temporary workday'>`  
-- `week`, `wday`, deine business days and/or non-business days by specifying weekdays in weeks  E.g., `(week=[2,4], wday=[3])` means the `2nd` and `4th` Wednesdays.
-- `month`, [optional] a list of months for which the rule is valid.
+- `type`, type of the calendar days, e.g.,  *local_holiday*, *local_workday*
+- `day`, a list of individual days. The day is a pair of  `<date, name>`, e.g., `<'10-12', 'temporary workday'>`  
+- `<week, wday>`, a specific weekdays,  e.g., `<week=[2,4], wday=[3]>` specifies the `2nd` and `4th` Wednesdays.
+- `month`, optional, a list of months for which the rule is valid.
 
 # Classes
 
