@@ -51,7 +51,8 @@ $format = 'Y年n月j日(b)\j\K';
 echo "format : '{$format}'\n";
 echo "output : ", $dt->format($format); // 昭和40年3月18日(月)jK 
 
-
-
-
+echo "\n\n";
+$time1 = '9:57'; $time2 = '10:45';
+echo "KsDateTime::interval('{$time1}', '{$time2})'\n";
+echo "output : ", KsDateTime::delta($time1, $time2), " minutes"; 
 

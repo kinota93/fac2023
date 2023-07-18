@@ -34,7 +34,7 @@ if ($fac){
     if (isset($fac['timeslots'])){
         echo "timeslots: " , $fac['timeslots'], "\n";
     }
-    echo "capacity: " , $fac['capacity'], "\n";
+    echo "capacity: " , $fac['capacity'], " / day\n";
 }else{
     echo "no such facility\n";
 }

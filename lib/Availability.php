@@ -61,7 +61,6 @@ class Availability{
         $rs = [];
 
         $bz_time = [];
-        $time_unit =  '1 hour';
         if (isset($fac['time'])){ // local business time
             $bz_time = $fac['time'];
         }elseif (isset($dat_facility['business'])){ // global business time
@@ -83,10 +82,9 @@ class Availability{
         if (isset($fac['timeunit'])) {
             $rs['timeslots'] = sprintf("every %d %s(s)", 
                 $fac['timeunit']['length'], $fac['timeunit']['unit']);
-            $time_unit = $fac['timeunit']['length'] .' ' . $fac['timeunit']['unit'];
         }
         if (!isset($rs['capacity']))
-            $rs['capacity'] = $this->calendar->interval($bz_time, $time_unit);
+            $rs['capacity'] = KsDateTime::delta($bz_time['open'], $bz_time['close']);
      
         return $rs;
     }
@@ -102,8 +100,14 @@ class Availability{
             list($y, $m, $d) = explode('-', $rev['date']);
             if ($y==$year and $m==$month){
                 $rs = ['type'=>'event', 'name'=>$rev['event']];
-                if (isset($rev['timeslot'])) $rs['timeslot'] = $rev['timeslot'];
-                if (isset($rev['timeslice'])) $rs['timeslice'] = $rev['timeslice'];
+                if (isset($rev['timeslot'])) {
+                    $rs['timeslot'] = $rev['timeslot'];
+                    $rs['reserved'] = count($rev['timeslot']);
+                }
+                if (isset($rev['timeslice'])) {
+                    $rs['timeslice'] = $rev['timeslice'];
+                    $rs['reserved'] =  KsDateTime::delta($rev['timeslice'][0],$rev['timeslice'][1]);
+                }
                 $dates[(int)$d][] =  $rs;
             }
         }
@@ -140,9 +144,13 @@ class Availability{
     function output($dates)
     {
         foreach (range(1, $this->calendar->lastday) as $d){
-            printf( "%02d(%s):\n", $d, $this->calendar->d2w($d, 'JP'));
-            if (!isset($dates[$d])) continue;    
-            
+            printf( "%02d(%s):", $d, $this->calendar->d2w($d, 'JP'));
+            if (!isset($dates[$d])) {
+                echo " ◎\n";
+                continue;    
+            }
+            $reserved = 0;
+            echo "\n";
             foreach ($dates[$d] as $r){
                 echo " * name: " . $r['name'] . "\n";
                 echo " - type: " . $r['type'] . "\n";
@@ -152,7 +160,11 @@ class Availability{
                 if (isset($r['timeslice'])){
                     echo " - time: " . implode(' - ' , $r['timeslice']) . "\n";
                 }
+                if (isset($r['reserved'])) $reserved += $r['reserved'];
             }
+            if ($reserved > 0)
+                echo " - reserved : {$reserved} △\n";
+            
         }
     }
 }

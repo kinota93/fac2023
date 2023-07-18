@@ -59,6 +59,14 @@ EOT; // single-quoted dochere string
         return self::HELP;
     }
 
+    public static function delta($time1, $time2)
+    {
+        $dtime1 = new \DateTimeImmutable($time1);
+        $dtime2 = new \DateTimeImmutable($time2);
+        $diff = abs($dtime1->getTimestamp() - $dtime2->getTimestamp()); 
+        return floor($diff/60);
+    }
+
     /** 和暦などを追加したformatメソッド  */
     public function format($format): string
     {

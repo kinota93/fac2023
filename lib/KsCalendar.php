@@ -72,10 +72,6 @@ class KsCalendar
         return $w;
     }
 
-    public function interval(array $bz_time, string $unit)
-    {
-        return 24;
-    }
     /** is_valid(): check the validality of a day */
     public function is_valid($d, $flag='DAY')
     {
