@@ -5,9 +5,17 @@
 
 *KsCal* is a pure PHP business calendar library. It provides a general framework for definition and calculation of national holidays, business calendar (business days / non-business days) and facility availability. The calculation is rule-based.  
 
-There are four types of dates: (1) **holiday**, either`national` or `local`, (2) **business day**, or **workday**, (3) **business weekday**, (4) **non-business weekday**, (5) **availability**,  either `available` or `reserved`.
+## Terms and Notations
 
-Note that a *local holiday* will ALWAYS be a non-business day, no matter how it was defined elsewhere. A *local workday* will ALWAYS be a business day, no matter how it was defined elsewhere.  A *national holiday* will be a non-business day unless it is explicitly defined as a local workday. *reservation*, reserved timespans or timeslots for a specific facility.
+1. *holiday* : `national holiday` or `local holiday`
+2. *business day*, or *workday*, *open day*
+3. *business weekday*, *open weekday*
+4. *non-business weekday*, *close weekday*
+5. *timeslice*, *timeslots*, available time / reserved time
+6. *reservation*, reserved time
+7. *availability*, status of time, `available` or `reserved`
+
+Note that a *local holiday* will ALWAYS be a non-business day, no matter how it was defined elsewhere. A *local workday* will ALWAYS be a business day, no matter how it was defined elsewhere.  A *national holiday* will be a non-business day unless it is explicitly defined as a local workday. 
 
 # Rule Specification
 
@@ -25,8 +33,8 @@ For a given a **year**,  the specification of rules for business calendar is giv
 
 - `type`, type of the calendar days, such as  *local_holiday*, *local_workday*
 - `day`, a list of individual days. The day is a pair of  `<date, name>`. E.g., `<'10-12':'temporary workday'>`  
-- `week`, `wday`, deine business days and/or non-business days by specifying weekdays in weeks  E.g., `(week=[2,4], wday=[3])` which means the `2nd` and `4th` Wednesdays.
-- `month`, [optional] a list of months for which the rule is valid. 
+- `week`, `wday`, deine business days and/or non-business days by specifying weekdays in weeks  E.g., `(week=[2,4], wday=[3])` means the `2nd` and `4th` Wednesdays.
+- `month`, [optional] a list of months for which the rule is valid.
 
 # Classes
 
