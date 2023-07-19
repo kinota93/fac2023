@@ -1,7 +1,7 @@
 # date must quoted otherwise it would be automatically converted into a Unix timestamp
 # cf. https://symfony.com/doc/current/reference/formats/yaml.html#strings
 
-- date: '2023-8-8'
+- date: '2023-8-10'
   facility_id: 12216
   timeslot: [1,2]
   event: OB講演会

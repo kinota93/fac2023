@@ -17,7 +17,7 @@ timeslots: &ksu_timeslots
 
 business: # 営業時間
   open: 9:00
-  close: 18:30
+  close: 20:00
 
 facility: # facility(施設)
   12017:

@@ -18,7 +18,7 @@ echo "\n";
 echo "===================================================================\n";
 
 echo "\n\n";
-echo "format: 'Y-m-d H:i:s': default, __toString()\n";
+echo "format: 'Y-m-d H:i:s', default, __toString()\n";
 echo "output : ", $dt;
 
 echo "\n\n";
@@ -53,6 +53,6 @@ echo "output : ", $dt->format($format); // 昭和40年3月18日(月)jK
 
 echo "\n\n";
 $time1 = '9:57'; $time2 = '10:45';
-echo "KsDateTime::interval('{$time1}', '{$time2})'\n";
+echo "KsDateTime::delta('{$time1}', '{$time2})'\n";
 echo "output : ", KsDateTime::delta($time1, $time2), " minutes"; 
 
