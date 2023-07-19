@@ -34,7 +34,7 @@ class KsCalendar
         $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
-    /** select() : selects days with specific weekdays */
+    /** select() : select days of specific weekdays */
     public function select($week, $wday=[], $prefer=1)
     {    
         $days = [];

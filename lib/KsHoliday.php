@@ -108,7 +108,7 @@ class KsHoliday
     {
         if (is_scalar($range))
             return $a === $range;
-        if (sizeof($range) >= 2)
+        if (sizeof($range) == 2)
             return ($range[0] <= $a and $a <= $range[1]);
         return false;
     }
@@ -182,10 +182,10 @@ class KsHoliday
                 $hday = $this->parseDay($_month, $d['day']);                    
                 if ($hday > 0){
                     $date = (new KsDateTime)->setDate($year, $_month, $hday);
-                    if ($sp_holiday != null ){ // for a pending sp_holiday 
+                    if ($sp_holiday != null ){ // fix the candidate sp_holiday 
                         if ($sp_holiday === $date){
                             $sp_holiday->modify('+1 day');
-                        }else{
+                        }else{ 
                             $holidays[$sp_holiday->format(self::DATE_FORMAT)] = self::SUPPLEMENT_HOLIDAY;
                             $sp_holiday = null;
                         }
@@ -193,7 +193,7 @@ class KsHoliday
                     $holidays[$date->format(self::DATE_FORMAT)] = $d['name'];
                     $cal = new KsCalendar($year, $_month);   
                     $wday = $cal->d2w($hday);
-                    if ($wday === 0) { // prepare a new sp_hodilday
+                    if ($wday === 0) { //  a candiate sp_hodilday 
                         $sp_holiday = (new KsDateTime)->setDate($year, $_month, $hday +1);
                     }                        
                 }    
@@ -201,7 +201,7 @@ class KsHoliday
         }
         ksort($holidays);
         
-        $ex_holidays =[]; // an extra holiday sandwiched by two holidays
+        $ex_holidays =[]; // check for extra holiday sandwiched by two holidays 
         $prev_date = null;
         foreach (array_keys($holidays) as $date){
             if ($prev_date and $this->sandwiched($prev_date, $date)){
