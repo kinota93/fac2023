@@ -11,7 +11,7 @@
   timeslot: [2,3,4]
   event: 合同中間発表会
 
-- date: '2023-9-12'
+- date: '2023-9-11'
   facility_id: 12311
   timeslice: [10:40,12:30]
   event: 運用室会議

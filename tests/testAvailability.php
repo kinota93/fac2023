@@ -41,5 +41,11 @@ if ($fac){
 
 echo "\n";
 echo "======\n";
+$dates = $avil->parseReservation($dat_reservation);
+echo json_encode($dates, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
+
+echo "\n";
+echo "======\n";
 $dates = $avil->getAvailability($dat_calendar, $dat_reservation);
 $avil->output($dates);
+
