@@ -8,29 +8,12 @@ use \kcal\KsCalendar;
 use \kcal\KsHoliday;
 use \kcal\Availability;
 
-define ('LIB_DIR', 'lib');
 define ('DAT_DIR', 'dat');
 
-// require LIB_DIR . '/KsCalendar.php';
-// require LIB_DIR . '/KsHoliday.php';
-// require LIB_DIR . '/Availability.php';
-
-// $dat_calendar = include(DAT_DIR . '/php/dat_calendar.php');
-// $dat_facility = include(DAT_DIR . '/php/dat_facility.php');
-// $dat_holiday = include(DAT_DIR . '/php/dat_holiday.php');
-// $dat_reservation = include(DAT_DIR . '/php/dat_reservation.php');   
-
-$input = file_get_contents(DAT_DIR . "/calendar.yaml");
-$dat_calendar = Yaml::parse($input);
-
-$input = file_get_contents(DAT_DIR . "/facility.yaml");
-$dat_facility = Yaml::parse($input);
-
-$input = file_get_contents(DAT_DIR . "/holiday.yaml");
-$dat_holiday = Yaml::parse($input);
-
-$input = file_get_contents(DAT_DIR . "/reservation.yaml");
-$dat_reservation = Yaml::parse($input);
+$dat_calendar = Yaml::parseFile(DAT_DIR . "/calendar.yaml");
+$dat_facility = Yaml::parseFile(DAT_DIR . "/facility.yaml");
+$dat_holiday = Yaml::parseFile(DAT_DIR . "/holiday.yaml");
+$dat_reservation = Yaml::parseFile(DAT_DIR . "/reservation.yaml");
 
 header('Content-Type: text/plain; charset=UTF-8');
 $year  = isset($_GET['y']) ? $_GET['y'] : 2023;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace kcal;
 
@@ -34,14 +35,14 @@ class KsHoliday
     private const EXTRA_HOLIDAY = '国民の休日';   
     private const DATE_FORMAT ='m-d'; // '01-07' for January 7 
     
-    public function __construct($year, $dat_holiday)
+    public function __construct(int $year, array $dat_holiday)
     {
         $this->year = $year;
         $this->holidays = $this->parseHolidays($dat_holiday);
     }
     
     /** get holidays of one month or a whole year (default)*/
-    public function getHolidays($month = 0)
+    public function getHolidays(int $month = 0)
     {
         if ($month == 0) return $this->holidays;
         
@@ -52,7 +53,7 @@ class KsHoliday
    
 
     /** query by name, support pattern matching  */
-    public function queryByname($name)
+    public function queryByname(string $name)
     {
         return array_filter($this->holidays, function($v) use($name){
             return preg_match("/{$name}/", $v);
@@ -60,7 +61,7 @@ class KsHoliday
     }
 
     /** query by date, support date format inference */
-    public function queryBydate($date)
+    public function queryBydate(string $date)
     {
         $date = $this->mkdate($date);
         return array_filter($this->holidays, function($v) use($date){
@@ -72,7 +73,7 @@ class KsHoliday
     /** Normalize date format while shifting back/forth some days 
      * e.g., mkdate('2-14', 3) => '02-17', mkdate('3-31',2) => '04-02'
     */
-    protected function mkdate ($date, $days = 0) : string
+    protected function mkdate (string $date, int $days = 0) : string
     {
         if (preg_match('/^[0-9]+-[0-9]+$/', $date)){
             list ($m, $d) = explode('-', $date);
@@ -83,14 +84,14 @@ class KsHoliday
         if (!isset($m, $d)) {
             throw new Exception('Invalid date format!');
         }
-        $time = mktime(0, 0, 0, $m, $d + $days, $this->year);
+        $time = mktime(0, 0, 0, (int)$m, (int)$d + $days, $this->year);
         return date(self::DATE_FORMAT, $time);
     }
 
     /** check if all elements of $keys are defined in $array 
      * e.g. all_defined(['tom','bob'], ['bob'=>23, 'abe'=>35, 'tom'=>56]) => TRUE
     */
-    protected  static function all_defined($keys, $array) : bool
+    protected  static function all_defined(array $keys, array $array) : bool
     {
         $diff = array_diff($keys, array_keys($array)); 
         return empty($diff); 
@@ -99,7 +100,7 @@ class KsHoliday
     /** check if all elements of $keys are defined in $array 
      * e.g. any_defined(['tom','bob'], ['bob'=>23, 'abe'=>35]) => TRUE
     */
-    protected  static function any_defined($keys, $array) : bool
+    protected  static function any_defined(array $keys, array $array) : bool
     {
         $common = array_intersect($keys, array_keys($array)); 
         return !empty($common); 
@@ -108,19 +109,18 @@ class KsHoliday
     /** check if $a is in range of $range[0] ~ $range[1] 
      * e.g. during(3, [2,4]) => TRUE  
     */
-    protected static function during($a, $range) : bool
+    protected static function during(mixed $a, array $range) : bool
     {
-        if (is_scalar($range))
-            return $a === $range;
-        if (sizeof($range) == 2)
-            return ($range[0] <= $a and $a <= $range[1]);
-        return false;
+        if (sizeof($range) != 2)
+            throw new Exception("Illegal arguments! the second argument should be an array of size 2");
+
+        return ($range[0] <= $a and $a <= $range[1]);
     }
     
     /** check if there is exact one day between 2 dates. Return the day if exists, or false otherwise 
      * e.g., sandwiched('03-31', '04-02') => '04-01'
     */
-    protected function sandwiched($date1, $date2) : string | bool
+    protected function sandwiched(string $date1, string $date2) : string | bool
     {
         if ( $date2 === $this->mkdate($date1, +2)){
             return $this->mkdate($date1, +1);
@@ -130,7 +130,7 @@ class KsHoliday
 
     /** parse day definition and calculate a definite day 
     */
-    private function parseDay($month, $day) : int
+    private function parseDay(int $month, mixed $day) : int
     {
         $cal = new KsCalendar($this->year, $month);
         if (is_integer($day))
@@ -145,7 +145,7 @@ class KsHoliday
     /** caculate spring and autumn equinox days  
      *  valid for years between 1851 and 2150. return -1 otherwise   
     */
-    private function equinox($holiday='springEquinox') : int
+    private function equinox(string $holiday='springEquinox') : int
     {
         $year = $this->year;
         if (!$this->during($year, [1851, 2150])){
@@ -163,11 +163,11 @@ class KsHoliday
             throw new Exception("Unknown holiday : " . $holiday);
         }    
         $alpha = ($holiday=='springEquinox') ? $delta[0] : $delta[1];
-        return floor($alpha + 0.242194 * ($year - 1980) - floor(($year - 1980) / 4));
+        return (int)floor($alpha + 0.242194 * ($year - 1980) - floor(($year - 1980) / 4));
     } 
 
     /** check if $day definition is valid for this year  */
-    private function validate($day) : bool
+    private function validate(array $day) : bool
     {
         $valid = true;
         if (isset($day['for'])){
@@ -183,7 +183,7 @@ class KsHoliday
     }
 
     /** parse holiday definitions and return an array of holidays for this year */
-    private function parseHolidays($dat_holiday)
+    private function parseHolidays(array $dat_holiday): array
     {
         if ($this->year < self::HOLIDAY_SINCE){
             return [];

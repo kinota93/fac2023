@@ -9,33 +9,22 @@ header('Content-Type: text/plain; charset=UTF-8');
 echo "*** UNIT TESTS (Symfony/Yaml)***\n";
 
 echo "\n\n";
-echo "=======dat/holiday.yaml============\n";
-$input = file_get_contents(DAT_DIR . "/holiday.yaml");
-$result = Yaml::parse($input);
-//print_r($result); 
-//var_dump($result);
-echo json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
-
-echo "\n\n";
-echo "=======dat/calendar.yaml============\n";
+echo "=======Yaml::parse('dat/holiday.yaml')============\n";
 $input = file_get_contents(DAT_DIR . "/calendar.yaml");
-$result = Yaml::parse($input);
-//print_r($result); 
-//var_dump($result);
-echo json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
+$dat_calendar = Yaml::parse($input);
+echo json_encode($dat_calendar , JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
 
 echo "\n\n";
-echo "=======dat/facility.yaml============\n";
-$input = file_get_contents(DAT_DIR . "/facility.yaml");
-$result = Yaml::parse($input);
-//print_r($result); 
-//var_dump($result);
-echo json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
+echo "=======Yaml::parseFile('dat/holiday.yaml')============\n";
+$dat_holiday = Yaml::parseFile(DAT_DIR . "/calendar.yaml");
+echo json_encode($dat_holiday, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
 
 echo "\n\n";
-echo "=======dat/reservation.yaml============\n";
-$input = file_get_contents(DAT_DIR . "/reservation.yaml");
-$result = Yaml::parse($input);
-//print_r($result); 
-//var_dump($result);
-echo json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
+echo "=======Yaml::parseFile('dat/facility.yaml')============\n";
+$dat_facility = Yaml::parseFile(DAT_DIR . "/facility.yaml");
+echo json_encode($dat_facility, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 
+
+echo "\n\n";
+echo "=======Yaml::parseFile('dat/reservation.yaml')============\n";
+$dat_reservation = Yaml::parseFile(DAT_DIR . "/reservation.yaml");
+echo json_encode($dat_reservation, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE); 

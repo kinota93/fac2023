@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace kcal;
 
@@ -54,22 +55,22 @@ EOT; // single-quoted dochere string
         return $this->format(self::DEFAULT_TO_STRING_FORMAT);
     }
     
-    public static function help()
+    public static function help() : string
     {
         return self::HELP;
     }
 
     /** compute time interval in minute between datetime strings */
-    public static function delta($time1, $time2)
+    public static function delta(string $time1, string $time2): int
     {
         $dtime1 = new \DateTimeImmutable($time1);
         $dtime2 = new \DateTimeImmutable($time2);
         $diff = abs($dtime1->getTimestamp() - $dtime2->getTimestamp()); 
-        return floor($diff/60);
+        return (int)floor($diff/60);
     }
 
     /** 和暦などを追加したformatメソッド  */
-    public function format($format): string
+    public function format(string $format): string
     {
         if (! preg_match(self::KSDATETIME_FORMAT, $format)){
             return parent::format($format);
@@ -111,13 +112,13 @@ EOT; // single-quoted dochere string
     }
 
     /** 指定した文字があるかどうか調べる（エスケープされているものは除外） */
-    private function hasChar($char, $string)
+    private function hasChar(string $char, string $string) : bool
     {  // 否定後読み「(?<!パターン)」。「\」以外で始まる対象文字にマッチ
-        return preg_match('/(?<!\\\)' . $char . '/', $string); 
+        return (bool)preg_match('/(?<!\\\)' . $char . '/', $string); 
     }
 
     /** 指定した文字を置換する(エスケープされていないもののみ) */
-    private function replaceChar($char, $replace, $string)
+    private function replaceChar(string $char, string |int $replace, string $string) : string
     {
         $string = preg_replace('/(?<!\\\)' . $char . '/', '${1}'. $replace, $string);
         $string = preg_replace('/\\\\' . $char . '/', $char, $string); // エスケープ文字を削除
@@ -125,7 +126,7 @@ EOT; // single-quoted dochere string
     }
 
     /** Lookup the gengo definition */
-    private function getGengo($now)
+    private function getGengo(int $now): array
     {
         $gengo = array();
         foreach (self::$gengoNameList as $g) {

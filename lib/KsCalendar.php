@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace kcal;
 
@@ -11,19 +12,19 @@ use function date;
 
 class KsCalendar
 {
-    public $year;// @var year
-    public $month;// @var month
-    public $lastday;// @var lastday of the month, days of the month
-    public $n_weeks;// @var number of weeks
-    public $firstwday;// @var weekday of the first day 
-    public $lastwday;// @var weekday of the last day
+    public int $year;// @var year
+    public int $month;// @var month
+    public int $lastday;// @var lastday of the month, days of the month
+    public int $n_weeks;// @var number of weeks
+    public int $firstwday;// @var weekday of the first day 
+    public int $lastwday;// @var weekday of the last day
     
     public const PREFER_TO_WDAY = 1;  // find the n'th weekday    
     public const PREFER_TO_WEEK = 2;  // in n'th week find the weekday  
     private const JP_WEEKDAY = ["日", "月", "火", "水", "木", "金", "土"];
     private const EN_WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    public function __construct($year, $month)
+    public function __construct(int $year, int $month)
     {
         $time = mktime(0, 0, 0, $month, 1, $year);
         $this->year = (int)date('Y', $time); 
@@ -31,11 +32,11 @@ class KsCalendar
         $this->lastday = (int)date('t', $time);
         $this->firstwday = (int)date('w', $time);
         $this->lastwday = $this->d2w($this->lastday);
-        $this->n_weeks = ceil(($this->firstwday + $this->lastday) / 7.0 ); 
+        $this->n_weeks = (int)ceil(($this->firstwday + $this->lastday) / 7.0 ); 
     }
 
     /** select() : select days of specified weekdays */
-    public function select($week, $wday=[], $prefer=1)
+    public function select(array|int $week, array|int $wday=[], int $prefer=1): array
     {    
         $days = [];
         if (is_scalar($week)) $week = [$week];
@@ -55,14 +56,14 @@ class KsCalendar
     } 
 
     /** w2d() : transform the n'th weekday to a day number */
-    public function w2d($wday, $n = 1)
+    public function w2d(int $wday, int $n = 1) : int
     {   
         $n = ($wday >= $this->firstwday) ?  $n - 1 : $n;
         return $n * 7 + $wday - $this->firstwday + 1;
     }
 
     /** d2w(): transform a day number to weekday */
-    public function d2w($day, $name='')
+    public function d2w(int $day, string $name='') : int | string
     {
         $w = ($this->firstwday + $day -1) % 7;
         if ($name === 'JP')
@@ -73,7 +74,7 @@ class KsCalendar
     }
 
     /** is_valid(): check the validality of a day */
-    public function is_valid($d, $flag='DAY')
+    public function is_valid(int  $d, string $flag='DAY') : bool
     {
         if ($flag==='DAY')
             return (1 <= $d and $d <= $this->lastday);
@@ -87,7 +88,7 @@ class KsCalendar
         return false;
     }
 
-    public function __toString()
+    public function __toString() : string
     {
         $out = "Sun Mon Tue Wed Thu Fri Sat\n";
         for ($i = 0; $i < $this->firstwday; $i++){

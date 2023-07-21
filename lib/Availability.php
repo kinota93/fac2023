@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace kcal;
 
 use Exception;
@@ -11,14 +13,14 @@ use function substr;
 use function array_merge;
 
 class Availability{
-    public $calendar;
-    public $holiday;
-    public $facility;
+    public object $calendar;
+    public object $holiday;
+    public int $facility;
 
     private const BUSINESS_DAY = '営業日';
     private const NON_BUSINESS_DAY = '定休日';    
 
-    public function __construct($calendar, $holiday ,$facility)
+    public function __construct(object $calendar, object $holiday, int $facility)
     {
         $this->calendar = $calendar;
         $this->holiday  = $holiday;
@@ -26,7 +28,7 @@ class Availability{
     }
 
     /** Calendar of business [week]days, non-business [week]days */
-    public function parseCalendar($dat_calendar)
+    public function parseCalendar(array $dat_calendar) : array
     {
         $month = $this->calendar->month;
         $dates = [];
@@ -50,7 +52,7 @@ class Availability{
         return $dates;
     }
 
-    public function parseFacility($dat_facility)
+    public function parseFacility(array $dat_facility) : array
     {
         $the_facility = $dat_facility['facility'];
         if (!isset($the_facility[$this->facility])) {
@@ -89,7 +91,7 @@ class Availability{
         return $rs;
     }
 
-    public function parseReservation($reservation)
+    public function parseReservation(array $reservation) : array
     {
         $year = $this->calendar->year;
         $month = $this->calendar->month;
@@ -114,7 +116,7 @@ class Availability{
         return $dates;
     }
     
-    public function getAvailability($calendar, $reservation)
+    public function getAvailability(array $calendar, array $reservation): array
     {
         $year = $this->calendar->year;
         $month = $this->calendar->month;
@@ -141,7 +143,7 @@ class Availability{
         return $dates;
     }
 
-    function output($dates)
+    function output(array $dates) : void
     {
         foreach (range(1, $this->calendar->lastday) as $d){
             printf( "%02d(%s):", $d, $this->calendar->d2w($d, 'JP'));
